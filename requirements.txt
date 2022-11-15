@@ -1,0 +1,8 @@
+networkx
+scipy
+pandas
+numpy
+scikit-learn
+tqdm
+category_encoders
+

@@ -1,0 +1,85 @@
+# command: dc_shell
+#     logic_synth.tcl
+#     Developed by
+#
+#     Daniel Capecci
+#     PhD Candidate
+#     University of Florida
+
+
+######################################################
+# SET PARAMS
+######################################################
+set rtl_name __RTL_NAME__
+set rtl_directory __RTL_DIRECTORY__
+set top_module __TOP_MODULE__
+
+set library __LIBRARY__
+set library_directory __LIBRARY_DIRECTORY__
+set library_target __LIBRARY_TARGET__
+set cache_directory __CACHE_DIRECTORY__
+set output_directory __OUTPUT_DIRECTORY__
+
+set rtl_file [format "%s/%s.v" $rtl_directory $rtl_name]
+set library_netlist [format "%s.v" $library]
+set library_db [format "%s.db" $library]
+######################################################
+
+# Create work folder
+define_design_lib work -path $cache_directory
+
+set_app_var search_path $library_directory
+
+# Load Library
+if {$library ne ""} {
+    set_app_var link_library $library_db
+}
+
+if {$library_target ne ""} {
+    set_app_var target_library [format "%s.db" $library_target]
+} else {
+    set_app_var target_library $library_db
+}
+
+# Read, analyze and elaborate the RTL code
+read_file -format verilog $rtl_file
+analyze -library work -format verilog $rtl_file
+elaborate $top_module -architecture verilog -library work
+# analyze -format verilog
+# current_design $top_module
+
+# Constraints
+# create_clock -name "clk" -period 10 -waveform { 5 10 }
+# set_max_area 8000
+# set_max_fanout 8 $top_module
+# set_max_transition 5 $top_module
+
+# Compile RTL Code
+compile -exact_map
+
+# write file
+file mkdir $output_directory
+if {$library_target ne ""} {
+    set out_path [format "%s/%s_%s.v" $output_directory $rtl_name $library_target]
+    set sdc_out_path [format "%s/%s_%s.sdc" $output_directory $rtl_name $library_target]
+} elseif {$library ne ""} {
+    set out_path [format "%s/%s_%s.v" $output_directory $rtl_name $library]
+    set sdc_out_path [format "%s/%s_%s.sdc" $output_directory $rtl_name $library]
+} else {
+    set out_path [format "%s/%s.v" $output_directory $rtl_name]
+    set sdc_out_path [format "%s/%s.sdc" $output_directory $rtl_name]
+}
+write -hierarchy -format verilog -output $out_path
+# write_sdc -nosplit -version 2.0 $sdc_out_path
+exit
+
+
+
+
+
+
+
+
+
+
+

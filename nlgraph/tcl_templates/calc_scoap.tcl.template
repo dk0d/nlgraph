@@ -1,0 +1,77 @@
+# command: tmax
+
+#     make_scoap.tcl
+#     Developed by
+#
+#     Daniel Capecci (o.g. Andrew Stern, Adib)
+#     PhD Candidate
+#     University of Florida
+
+###########################################################################################################################################################
+## The following code will create functional patterns
+###########################################################################################################################################################
+
+######################################################
+# SET PARAMS
+######################################################
+set benchmark_id __BENCHMARK_ID__
+set benchmark_name __BENCHMARK_NAME__
+set benchmark_directory __BENCHMARK_DIRECTORY__
+set top_module __TOP_MODULE__
+set library __LIBRARY__
+
+set library_directory __LIBRARY_DIRECTORY__
+set output_directory __OUTPUT_DIRECTORY__
+
+set v_file [format "%s/%s.v" $benchmark_directory $benchmark_id]
+set library_netlist [format "%s/%s.v" $library_directory $library]
+set scoap_out [format "%s/%s.scoap" $output_directory $benchmark_id]
+set faults_out [format "%s/%s.fault" $output_directory $benchmark_id]
+######################################################
+
+## Setup library and netlist
+if {$library ne ""} {
+    read_netlist $library_netlist -library
+}
+read_netlist $v_file
+
+############################
+## Setup build environment
+#############################
+set_build -nodelete_unused_gates -merge noglobal_tie_propagate
+
+if {$library eq ""} {
+    foreach_in_collection module_obj [get_modules "*"] {
+        set mod [get_attribute $module_obj module_name]
+        if {$mod ne $top_module} {
+            set_build -black_box $mod
+        }
+    }
+}
+
+run_build_model $top_module
+
+
+# FAULT Reports
+set_drc -nofile
+set_rules C4 -autofix
+run_drc
+
+set_faults -model stuck -fault_coverage
+add_faults -all
+run_atpg
+
+#set_random_patterns -length $num_func_patterns
+#set_patterns -random
+#run_simulation -store
+# report_patterns -all > $pattern_report
+# write_patterns $pattern_out -replace -internal -format stil -cycle_count -nopatinfo -parallel 0 -cellnames parallel
+
+set_faults -summary verbose
+report_faults -all -collapsed > $faults_out
+
+# SCOAP Reports
+set_pindata -scoap_data
+report_primitives -all > $scoap_out
+
+exit
