@@ -124,7 +124,7 @@ ENCODERS = {
 }
 
 
-class nlgraphEnum(Enum):
+class NLGraphEnum(Enum):
 
     @classmethod
     def fromString(cls, s: str):
@@ -142,7 +142,7 @@ class nlgraphEnum(Enum):
 
     def __call__(self, t):
         if isinstance(t, str):
-            return nlgraphEnum.fromString(t)
+            return NLGraphEnum.fromString(t)
         elif isinstance(t, int):
             for i, nt in enumerate(self.__class__):
                 if t == i:

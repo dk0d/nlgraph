@@ -20,7 +20,7 @@ from torch_geometric.data import Data
 
 from .common import RegexConstants
 from .parse.synopsis import ScoapData
-from .utils import nlgraphEnum
+from .utils import NLGraphEnum
 
 NodeID = str
 NetID = str
@@ -46,7 +46,7 @@ class NodePort:
         return self.__repr__()
 
 
-class NodeType(str, nlgraphEnum):
+class NodeType(str, NLGraphEnum):
     """
     Comment or uncomment to enable support for more node types.
 

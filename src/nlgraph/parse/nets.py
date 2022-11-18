@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Union, List
 import tqdm
 from ..common import RegexConstants, LibraryType
-from ..utils import nlgraphEnum, Benchmark
+from ..utils import NLGraphEnum, Benchmark
 
 
 class Library:
@@ -156,7 +156,7 @@ class LibraryConstants:
     ]
 
 
-class GateType(str, nlgraphEnum):
+class GateType(str, NLGraphEnum):
     and_ = ('and', r'[^n]and|^and')
     nor = ('nor', r'nor')
     inv = ('inv', r'inv|hi\ds\d|^i\ds\d')
@@ -214,7 +214,7 @@ class GateType(str, nlgraphEnum):
         return self.value >= other.value
 
 
-class NetType(str, nlgraphEnum):
+class NetType(str, NLGraphEnum):
     input_ = 'input'
     output_ = 'output'
     wire = 'wire'
