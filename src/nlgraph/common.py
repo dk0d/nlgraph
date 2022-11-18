@@ -5,92 +5,7 @@ import re
 import string
 from enum import Enum
 from pathlib import Path
-# try:
-#     from antlr4 import *
-#
-#
-#     class ParseListener(ParseTreeListener):
-#
-#         def __init__(self):
-#             self.progress = tqdm.tqdm(desc='Parsing file', bar_format='{desc} [{elapsed} {rate_fmt}]')
-#
-#         def exitEveryRule(self, ctx: ParserRuleContext):
-#             self.progress.update()
-#
-#         # def visitTerminal(self, node: TerminalNode):
-#         #     self.progress.close()
-#         def close(self):
-#             self.progress.close()
-#
-#
-#     def parsePipeline(
-#         filename: Path,
-#         _Lexer: Type[Lexer],
-#         _Parser: Type[Parser],
-#         _Listener: Type[ParseTreeListener],
-#         verbose=True
-#     ):
-#         """
-#         Assumes the root rule on the parser is called "source_text"
-#
-#         returns: Intantiated listener
-#
-#         """
-#         logger = None
-#         tic = None
-#         if verbose:
-#             tic = time.time()
-#             logger = logging.getLogger(filename.name)
-#             logger.setLevel(logging.DEBUG)
-#             if not logger.hasHandlers():
-#                 # create console handler and set level to debug
-#                 ch = logging.StreamHandler()
-#                 ch.setLevel(logging.DEBUG)
-#                 # create formatter
-#                 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-#                 # add formatter to ch
-#                 ch.setFormatter(formatter)
-#                 # add ch to logger
-#                 logger.addHandler(ch)
-#
-#         if logger is not None:
-#             logger.info("Lexing...")
-#         lexer = _Lexer(FileStream(filename.expanduser().absolute().as_posix()))
-#
-#         if logger is not None:
-#             logger.info('Token stream...')
-#         stream = CommonTokenStream(lexer)
-#
-#         if logger is not None:
-#             logger.info('Initializing parser...')
-#         parser = _Parser(stream)
-#         progress = ParseListener()
-#         parser.addParseListener(progress)
-#
-#         if logger is not None:
-#             logger.info('Parsing source text...')
-#         tree = parser.source_text()
-#         progress.close()
-#
-#         if logger is not None:
-#             logger.info('Initializing listener...')
-#         graphListener = _Listener()
-#
-#         if logger is not None:
-#             logger.info('Initializing walker..')
-#         walker = ParseTreeWalker()
-#
-#         if logger is not None:
-#             logger.info('Walking abstract syntax tree...')
-#         walker.walk(graphListener, tree)
-#
-#         if tic is not None:
-#             tqdm.tqdm.write(f'Parsed in {time.time() - tic:.3f} secs')
-#
-#         return graphListener, logger
-#
-# except ImportError as e:
-#     pass
+
 from typing import List, Optional
 
 
@@ -228,7 +143,7 @@ class Template(str, Enum):
         return self._templatePath() / f'{self.value}.tcl.template'
 
 
-class nlgraphTemplate(Template):
+class NLGraphTemplate(Template):
     logicSynth = 'logic_synth'
     calcScoap = 'calc_scoap'
     logicDepth = 'logic_depth'
