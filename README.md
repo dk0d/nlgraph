@@ -24,15 +24,10 @@ $ sh envsetup.sh nlgraph 3.9 1.13
 `CUDA_VERSION` is blank by default and the script checks to see what cuda version is
 available based on calling `nvidia-smi`.
 
-Finally, (in the same directory as `envsetup.sh`) run
-```bash
-$ pip install -e . 
-```
 
 # Usage
 
-// todo 
-
+> [!TODO]
 
 ### Notes
 * Include SCOAP values/node attributes as a key-value pair in the `Graph.nodes` attribute
