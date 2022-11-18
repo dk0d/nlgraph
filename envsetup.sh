@@ -97,6 +97,8 @@ pip install category_encoders
 # Other packages
 conda install seaborn networkx jsonpickle ipython pandas tqdm pytest matplotlib scikit-image scipy scikit-learn scikit-learn-intelex pyyaml -y
 
+pip install -e .
+
 echo ""
 echo "GOOD TO GO!"
 echo "Activate the $ENV_NAME environment by entering 'conda activate $ENV_NAME'

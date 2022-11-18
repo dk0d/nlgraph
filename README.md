@@ -5,7 +5,8 @@ Reads a verilog gate-level netlist into a `nlgraph.Graph` object
 
 # Environment Setup
 
-_Working on pypi release_
+**TODO**: pypi release
+**TODO**: pyproject.toml
 
 **NOTE**
 You can run the `envsetup.sh` script to create 
