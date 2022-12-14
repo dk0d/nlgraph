@@ -7,24 +7,20 @@ PYTORCH_VERSION=${3-1.12}
 CUDA_VERSION=${4-}
 ######################
 
-if [[ -z "$CUDA_VERSION" ]]
-then
-  if ! command -v nvidia-smi &> /dev/null
-  then
-    CUDA_VERSION=""
+if [[ -z "$CUDA_VERSION" ]]; then
+  if ! command -v nvidia-smi &>/dev/null; then
+    CUDA_VERSION="cpu"
   else
     CUDA_VERSION="$(nvidia-smi | egrep -o 'CUDA Version:\s([0-9.])+' | egrep -o '[0-9.]+')"
     echo "FOUND CUDA Version: $CUDA_VERSION"
   fi
 fi
 
-if [[ "$PYTORCH_VERSION" == "latest" ]]
-then
+if [[ "$PYTORCH_VERSION" == "latest" ]]; then
   TORCH_STRING="pytorch"
 else
   TORCH_STRING="pytorch=$PYTORCH_VERSION"
 fi
-
 
 echo "
 creating env    :   $ENV_NAME
@@ -33,19 +29,18 @@ pytorch version :   $PYTORCH_VERSION ($TORCH_STRING)
 cuda version    :   $CUDA_VERSION
 "
 
-find_in_conda_env(){
-    conda env list | grep "${@}" >/dev/null 2>/dev/null
+find_in_conda_env() {
+  conda env list | grep "${@}" >/dev/null 2>/dev/null
 }
 
-if ! command -v conda &> /dev/null
-then
-    echo "Sourcing conda..."
-    source /usr/local/anaconda3/settings
+if ! command -v conda &>/dev/null; then
+  echo "Sourcing conda..."
+  source /usr/local/anaconda3/settings
 fi
 
 eval "$(conda shell.bash hook)"
 
-if find_in_conda_env "$ENV_NAME" ; then
+if find_in_conda_env "$ENV_NAME"; then
   echo "Removing existing $ENV_NAME environment..."
   conda env remove --name $ENV_NAME
   echo "Done."
@@ -65,7 +60,7 @@ source activate $ENV_NAME
 #else  # Unknown.
 #fi
 
-if [[ "$CUDA_VERSION" != "" ]]; then
+if [[ "$CUDA_VERSION" != "cpu" ]]; then
   conda install $TORCH_STRING torchvision torchaudio cudatoolkit=$CUDA_VERSION -c pytorch -y
 else
   conda install $TORCH_STRING torchvision torchaudio -c pytorch -y
@@ -79,7 +74,7 @@ conda install pyg -c pyg -y
 #  GEO_URL=https://data.pyg.org/whl/torch-$PYTORCH_VERSION
 #fi
 #if [[ "$CUDA_VERSION" != "" ]]; then
-#  CV="${$CUDA_VERSION//.}"
+#  CV="${$CUDA_VERSION//./}"
 #  GEO_URL="$GEO_URL+cu$CV.html"
 #else
 #  GEO_URL="$GEO_URL+cpu.html"
@@ -101,5 +96,4 @@ pip install -e .
 
 echo ""
 echo "GOOD TO GO!"
-echo "Activate the $ENV_NAME environment by entering 'conda activate $ENV_NAME'
-
+echo "Activate the $ENV_NAME environment by entering 'conda activate $ENV_NAME'"
