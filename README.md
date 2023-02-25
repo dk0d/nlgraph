@@ -2,7 +2,9 @@
 
 NeList Graph
 
-Reads a verilog gate-level netlist into a `nlgraph.Graph` object
+Reads a verilog gate-level netlist into a `nlgraph.Graph` object.
+
+The `Graph` object provides utilities for working with netlist graphs and machine learning using pytorch.
 
 # TODOs
 
