@@ -1,36 +1,36 @@
-[build-system]
-requires = ['hatchling']
-build-backend = 'hatchling.build'
+[tool.pdm]
+[tool.pdm.dev-dependencies]
+test = [
+    "pytest>=7.2.1",
+]
 
 [project]
-name = 'nlgraph'
-version = '0.1.0'
-authors = [{ name = 'dk0d' }]
-description = 'netlist to graph api'
-long_description = 'README.md'
-long_description_content_type = 'text/markdown'
-requires-python = '>=3.7'
-classifiers = [
-    'Development Status :: 3 - Alpha',
-    'Intended Audience :: Developers',
-    'Topic :: Software Development :: Build Tools',
-    'License :: OSI Approved :: MIT License',
-    'Programming Language :: Python :: 3.9'
+name = "nlgraph"
+version = "0.1.1"
+description = "Utility package for working with gate-level netlists and machine learning in pytorch."
+authors = [
+    {name = "Daniel Capecci", email = "7775585+dk0d@users.noreply.github.com"},
 ]
-package_dir = 'src'
 dependencies = [
-    'tqdm',
-    'seaborn',
-    'scipy',
-    'networkx',
-    'matplotlib',
-    'numpy',
-    'category_encoders',
-    'scikit-image',
-    'scikit-learn',
-    'pandas',
-    'torch',
-    'torchvision',
-    'torchaudio',
-    'tensorboard'
+    "pytorch-lightning>=1.9.3",
+    "networkx>=3.0",
+    "ipython>=8.10.0",
+    "pandas>=1.5.3",
+    "matplotlib>=3.7.0",
+    "scikit-learn>=1.2.1",
+    "category-encoders>=2.6.0",
+    "torchinstaller>=0.3.3",
+    "jsonpickle>=3.0.1",
 ]
+requires-python = ">=3.10"
+readme = "README.md"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pdm.scripts]
+torch_install_dry_run = "torchinstall --pytorch --lightning"
+torch_install_all = "torchinstall --pytorch --lightning -i"
+torch_install_pyg_source = "torchinstall --pyg -pyg-src -i"

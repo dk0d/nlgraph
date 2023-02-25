@@ -24,6 +24,7 @@ import tqdm
 from .common import Template, Benchmark
 
 
+
 def multiprocess(
     func,
     argsList,

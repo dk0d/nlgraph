@@ -981,7 +981,7 @@ class DataHelpers:
         :return: A pandas dataframe containing the fault report data
         """
         s = path.read_text()
-        tokens = [{k: v for k, v in zip(['stuckAt', 'faultType', 'pin'], re.split('\s+', _s.strip('\n{} ')))} for _s in
+        tokens = [{k: v for k, v in zip(['stuckAt', 'faultType', 'pin'], re.split(r'\s+', _s.strip('\n{} ')))} for _s in
                   re.split(r'\n', s)]
 
         # if len(tokens) % 3 != 0:
@@ -1447,7 +1447,7 @@ class Graph(object):
         name: str = "graph",
         graphType: GraphType = GraphType.directed,
         nodes: OrderedDict[NodeID, NodeAttributes] = None,
-        edges: [Tuple[NodePort, NodePort, EdgeAttributes]] = None,
+        edges: List[Tuple[NodePort, NodePort, EdgeAttributes]] = None,
         sourceFile=None
     ):
         """

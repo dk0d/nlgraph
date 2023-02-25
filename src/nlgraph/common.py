@@ -9,6 +9,9 @@ from pathlib import Path
 from typing import List, Optional
 
 
+PathLike = str | Path
+
+
 def makeNumerical(val: str):
     try:
         if '.' in val:
