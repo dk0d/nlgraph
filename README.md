@@ -9,35 +9,44 @@ The `Graph` object provides utilities for working with netlist graphs and machin
 # TODOs
 
 - [ ] pypi release
-- [ ] pyproject.toml
 - [ ] Usage examples in readme
 
-# Environment Setup
+# Post Install PyTorch Dependencies
 
-**NOTE**
-You can run the `envsetup.sh` script to create
-a conda environment and install all `nlgraph` dependencies
+After installation, you can use `torchinstaller` (installed as a dependency to this project) to help install pytorch and torch-geometric dependencies if you'd like.
+`torchinstaller` helps to automatically detect cuda versions and/or just to build the right install commands for pytorch, etc.
+See [`torchinstaller`](https://github.com/dk0d/torchinstaller) for more details.
 
-The script takes 4 optional parameters
+e.g.
 
-```bash
-$ sh envsetup.sh [ENVIRONMENT_NAME] [PYTHON_VERSION] [PYTORCH_VERSION] [CUDA_VERSION]
-```
-
-The default script values are:
+Dry run install (no `-i` flag)
 
 ```bash
-$ sh envsetup.sh nlgraph 3.9 1.13
+> torchinstall --pytorch --lightning --pyg -pyg-src
 ```
 
-`CUDA_VERSION` is blank by default and the script checks to see what cuda version is
-available based on calling `nvidia-smi`.
+PyTorch and PyTorch-Lightning
 
-### Notes
+```bash
+> torchinstall --pytorch --lightning -i
+```
 
-* Include SCOAP values/node attributes as a key-value pair in the `Graph.nodes` attribute
-* The same for edges, have edge attributes be a key-value pair in the dictionary of the attribute tuple
+PyTorch-Geometric
 
+```bash
+> torchinstall --pyg -i
+torchinstall --pyg -pyg-src -i
+torchinstall --pytorch --lightning --pyg -pyg-src -i
+```
 
+PyTorch-Geometric from source
 
+```bash
+> torchinstall --pyg -pyg-src -i
+```
 
+Install all
+
+```bash
+> torchinstall --pytorch --lightning --pyg -pyg-src -i
+```
