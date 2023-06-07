@@ -1,36 +1,41 @@
-[tool.pdm]
-[tool.pdm.dev-dependencies]
-test = [
-    "pytest>=7.2.1",
-]
-
 [project]
 name = "nlgraph"
-version = "0.1.1"
 description = "Utility package for working with gate-level netlists and machine learning in pytorch."
 authors = [
-    {name = "Daniel Capecci", email = "7775585+dk0d@users.noreply.github.com"},
+    { name = "Daniel Capecci", email = "7775585+dk0d@users.noreply.github.com" },
 ]
 dependencies = [
-    "pytorch-lightning>=1.9.3",
+    "lightning>=2.0.2",
     "networkx>=3.0",
     "ipython>=8.10.0",
     "pandas>=1.5.3",
     "matplotlib>=3.7.0",
     "scikit-learn>=1.2.1",
     "category-encoders>=2.6.0",
-    "torchinstaller>=0.3.3",
+    "torchinstaller @ git+https://github.com/dk0d/torchinstaller.git",
     "jsonpickle>=3.0.1",
 ]
 requires-python = ">=3.10"
 readme = "README.md"
-license = {text = "MIT"}
+license = { text = "MIT" }
+dynamic = ["version"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.optional-dependencies]
+test = ["pytest>=7.2.1"]
+
+[tool.hatch.version]
+path = "src/nlgraph/__about__.py"
+
+[tool.hatch.envs.default.scripts]
+torchinstall_dryrun = "torchinstall --pytorch --lightning --pyg -pyg-src"
+torchinstall_pt = "torchinstall --pytorch --lightning -i"
+torchinstall_pyg = "torchinstall --pyg -i"
+torchinstall_pyg_source = "torchinstall --pyg -pyg-src -i"
+torchinstall_all = "torchinstall --pytorch --lightning --pyg -pyg-src -i"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-
-[tool.pdm.scripts]
-torch_install_dry_run = "torchinstall --pytorch --lightning"
-torch_install_all = "torchinstall --pytorch --lightning -i"
-torch_install_pyg_source = "torchinstall --pyg -pyg-src -i"
