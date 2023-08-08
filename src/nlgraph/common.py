@@ -14,7 +14,7 @@ PathLike = str | Path
 
 def makeNumerical(val: str):
     try:
-        if '.' in val:
+        if "." in val:
             return float(val)
         return int(val)
     except:
@@ -36,29 +36,37 @@ class RegexConstants:
     BIAS_EXP = r"[10]'b[10]"
 
     # ['D', 'CLK', 'IN', 'INP', 'RSTB', 'S', 'CI'] added 'A' - 'P' for benchmark parsing
-    PIN_INPUT_EXP = r'IN\d*|D\d*|INP\d*|RSTB\d*|S\d*|CLK\d*|[A-P]\d*|CI'
+    PIN_INPUT_EXP = r"IN\d*|D\d*|INP\d*|RSTB\d*|S\d*|CLK\d*|[A-P]\d*|CI"
 
     # ['Q', 'QN', 'Z', 'ZN', 'CO'] added 'Y' for benchmark parsing
-    PIN_OUTPUT_EXP = r'Q\d*|QN\d*|Z\d*|ZN\d*|Y\d*|CO'
+    PIN_OUTPUT_EXP = r"Q\d*|QN\d*|Z\d*|ZN\d*|Y\d*|CO"
 
-    ADDER_INPUT_EXP = r'IN\d*|D\d*|INP\d*|RSTB\d*|CLK\d*|[A-P]\d*|CI'
-    ADDER_OUTPUT_EXP = r'Q\d*|QN\d*|Z\d*|ZN\d*|Y\d*|CO|SO?\d*'
+    ADDER_INPUT_EXP = r"IN\d*|D\d*|INP\d*|RSTB\d*|CLK\d*|[A-P]\d*|CI"
+    ADDER_OUTPUT_EXP = r"Q\d*|QN\d*|Z\d*|ZN\d*|Y\d*|CO|SO?\d*"
 
-    ID_EXP = r'[\/\\\w\d\-]+'
-    ID_LIST = r'[\/\\\w\d\s\-,]+'
-    ID_BUS_EXP = r'[\/\\\[\]\w\d\-]+'
-    ID_BUS_EXP_LIST = r'[\/\\\[\]\w\d\s\-,]+'
-    RANGE = r'\s*\[(\d+\:\d+)\]'
-    PORT_LIST = r'[\/\\\[\]\d\w\s,\(\)\.]+'
+    ID_EXP = r"[\/\\\w\d\-_]+"
+    ID_LIST = r"[\/\\\w\d\s\-,_]+"
+    ID_BUS_EXP = r"[\/\\\[\]\w\d\-_]+"
+    ID_BUS_EXP_LIST = r"[\/\\\[\]\w\d\s\-,_]+"
+    RANGE = r"\s*\[(\d+\:\d+)\]"
+    PORT_LIST = r"[\/\\\[\]\d\w\s,\(\)\._]+"
 
-    NEWLINE = r'[\s\n]+'
+    NEWLINE = r"[\s\n]+"
 
-    MODULE_EXP = r'module\s+(' + ID_EXP + r')\s*\((' + ID_LIST + ')\)\s*\;'
-    INPUT_EXP = r'input(?:' + RANGE + ')?\s+(' + ID_BUS_EXP_LIST + ')\s*\;'
-    OUTPUT_EXP = r'output(?:' + RANGE + ')?\s+(' + ID_BUS_EXP_LIST + ')\s*\;'
-    WIRE_EXP = r'wire(?:' + RANGE + ')?\s+(' + ID_BUS_EXP_LIST + ')\s*\;'
-    ASSIGN_EXP = r'assign\s+(' + ID_BUS_EXP + r')\s*=\s*(' + ID_BUS_EXP + r')\s*\;'
-    ENTRY_EXP = r'((?![module])' + ID_EXP + r')\s+(' + ID_BUS_EXP + r')\s*\(\s*(' + PORT_LIST + ')\s*\)\s*\;'
+    MODULE_EXP = r"module\s+(" + ID_EXP + r")\s*\((" + ID_LIST + r")\)\s*\;"
+    INPUT_EXP = r"input(?:" + RANGE + r")?\s+(" + ID_BUS_EXP_LIST + r")\s*\;"
+    OUTPUT_EXP = r"output(?:" + RANGE + r")?\s+(" + ID_BUS_EXP_LIST + r")\s*\;"
+    WIRE_EXP = r"wire(?:" + RANGE + r")?\s+(" + ID_BUS_EXP_LIST + r")\s*\;"
+    ASSIGN_EXP = r"assign\s+(" + ID_BUS_EXP + r")\s*=\s*(" + ID_BUS_EXP + r")\s*\;"
+    ENTRY_EXP = (
+        r"((?![module])"
+        + ID_EXP
+        + r")\s+("
+        + ID_BUS_EXP
+        + r")\s*\(\s*("
+        + PORT_LIST
+        + r")\s*\)\s*\;"
+    )
     PORT_DECLARATION_EXP = r"\.([A-z]+\d*)\((.+)\)"
 
 
@@ -67,11 +75,11 @@ class InvalidLibraryType(Exception):
 
 
 class LibraryType(Enum):
-    gsc45_svt_3p0 = 'gsclib45_svt_3p0'
-    gsc180_svt_3p0 = 'gsclib180_svt_3p0'
-    saed90_typ_1p11 = 'saed90_typ_1p11'
-    leda_fpga = 'leda_fpga'
-    blackbox = 'blackbox'
+    gsc45_svt_3p0 = "gsclib45_svt_3p0"
+    gsc180_svt_3p0 = "gsclib180_svt_3p0"
+    saed90_typ_1p11 = "saed90_typ_1p11"
+    leda_fpga = "leda_fpga"
+    blackbox = "blackbox"
 
     def __repr__(self):
         return self.value
@@ -85,14 +93,14 @@ class LibraryType(Enum):
             LibraryType.gsc45_svt_3p0,
             LibraryType.gsc180_svt_3p0,
             LibraryType.saed90_typ_1p11,
-            LibraryType.leda_fpga
+            LibraryType.leda_fpga,
         ]:
-            return f'{self.value}.v'
+            return f"{self.value}.v"
         return None
 
     @property
     def libDir(self):
-        return Path(__file__).parent / 'libraries'
+        return Path(__file__).parent / "libraries"
 
     @property
     def libPath(self):
@@ -107,20 +115,19 @@ class LibraryType(Enum):
         for lt in cls:
             if re.search(lt.value, x) is not None or re.search(x, lt.value) is not None:
                 return lt
-        raise InvalidLibraryType(f'{x}')
+        raise InvalidLibraryType(f"{x}")
 
     def inputpinSequence(self, num):
         if self in [LibraryType.gsc45_svt_3p0, LibraryType.gsc180_svt_3p0]:
             return string.ascii_uppercase[:num]
         elif self == LibraryType.saed90_typ_1p11:
-            return [f'IN{i + 1}' for i in range(num)]
+            return [f"IN{i + 1}" for i in range(num)]
 
 
 class Template(str, Enum):
-
     @classmethod
     def _folderName(cls):
-        return 'tcl_templates'
+        return "tcl_templates"
 
     @classmethod
     def _templatePath(cls):
@@ -132,24 +139,24 @@ class Template(str, Enum):
             f = re.search(string, nType.value, re.IGNORECASE)
             if f is not None:
                 return nType
-        raise Exception(f'String not a valid node type: {string}')
+        raise Exception(f"String not a valid node type: {string}")
 
     def __call__(self, value: str):
         return Template.fromString(value)
 
     @property
     def helperPath(self):
-        return self._templatePath() / 'helpers.tcl'
+        return self._templatePath() / "helpers.tcl"
 
     @property
     def path(self):
-        return self._templatePath() / f'{self.value}.tcl.template'
+        return self._templatePath() / f"{self.value}.tcl.template"
 
 
 class NLGraphTemplate(Template):
-    logicSynth = 'logic_synth'
-    calcScoap = 'calc_scoap'
-    logicDepth = 'logic_depth'
+    logicSynth = "logic_synth"
+    calcScoap = "calc_scoap"
+    logicDepth = "logic_depth"
 
 
 def getTopModule(path: Path):
@@ -157,7 +164,7 @@ def getTopModule(path: Path):
         return None
     try:
         text = path.read_text()
-        name = re.search(r'module\s+([_\/\\\w\d\-]+)\s*\(?', text).group(1)
+        name = re.search(r"module\s+([_\/\\\w\d\-]+)\s*\(?", text).group(1)
     except FileNotFoundError:
         return None
     return name
@@ -165,7 +172,6 @@ def getTopModule(path: Path):
 
 # [design name]_[library name][technology node]_[lib voltage]_[lib version]_[version].v
 class Benchmark:
-
     def paramDict(self, **additionalParams):
         params = dict(
             benchmark_id=self.identifier,
@@ -185,18 +191,18 @@ class Benchmark:
     def parseLibraryName(name: str):
         parts: List[Optional[str]] = name.split("_")
         try:
-            libnode = re.search(r'([A-Za-z]+)(\d+)', parts[0])
+            libnode = re.search(r"([A-Za-z]+)(\d+)", parts[0])
             parts[0] = libnode.group(1)
             parts.insert(1, libnode.group(2))
         except:
-            parts.insert(1, '')
+            parts.insert(1, "")
             parts[1] = None
         return parts
 
     @staticmethod
     def fromDesignPath(path: Path) -> Benchmark:
         filename = path.name
-        if '.' in filename:
+        if "." in filename:
             name = Path(filename).stem
         else:
             name = filename
@@ -212,15 +218,15 @@ class Benchmark:
             "version",
         ]
         if len(parts) == 7:
-            keys.append('modifier')
+            keys.append("modifier")
         pairs = zip(keys, parts)
         pairs = {k: v for k, v in pairs}
-        pairs['rootDir'] = path.parent
+        pairs["rootDir"] = path.parent
         return Benchmark(**pairs)
 
     @property
     def vPath(self):
-        return self._fullPath('v')
+        return self._fullPath("v")
 
     @property
     def topModuleName(self):
@@ -230,35 +236,40 @@ class Benchmark:
     def benchName(self):
         library = self.library
         if library is not None:
-            return '_'.join([
-                self.designName,
-                library
-            ])
+            return "_".join([self.designName, library])
         return self.designName
 
     @property
     def test_benchName(self):
         library = self.library
         if library is not None:
-            return '_'.join([
-                self.designName,
-                library,
-                "expected"
-            ])
+            return "_".join([self.designName, library, "expected"])
         return self.designName
 
     @property
     def library(self):
-        if all([c is not None for c in [self.libraryName, self.techNode, self.libVoltage, self.libVersion]]):
-            return "_".join([f'{self.libraryName}{self.techNode}', self.libVoltage, self.libVersion])
+        if all(
+            [
+                c is not None
+                for c in [
+                    self.libraryName,
+                    self.techNode,
+                    self.libVoltage,
+                    self.libVersion,
+                ]
+            ]
+        ):
+            return "_".join(
+                [f"{self.libraryName}{self.techNode}", self.libVoltage, self.libVersion]
+            )
         return None
 
     @property
     def libraryType(self):
-        return LibraryType.get(f'{self.libraryName}{self.techNode}')
+        return LibraryType.get(f"{self.libraryName}{self.techNode}")
 
     def libPathWithRoot(self, root):
-        return root / f'{self.library}.v' if self.library is not None else None
+        return root / f"{self.library}.v" if self.library is not None else None
 
     @property
     def identifier(self):
@@ -277,32 +288,32 @@ class Benchmark:
         return Path(self.benchName)
 
     def _dataFile(self, ext):
-        name = f'{self.identifier}{ext}'
+        name = f"{self.identifier}{ext}"
         if self.versionsDir is not None:
             return self.versionsDir / name
         return Path(name)
 
     @property
     def scoapPath(self) -> Path:
-        return self._dataFile('.scoap')
+        return self._dataFile(".scoap")
 
     @property
     def faultPath(self) -> Path:
-        return self._dataFile('.fault')
+        return self._dataFile(".fault")
 
     @property
     def switchPath(self) -> Path:
-        return self._dataFile('.switching')
+        return self._dataFile(".switching")
 
     @property
     def graphPath(self):
-        return self._dataFile('.pt')
+        return self._dataFile(".pt")
 
     @property
     def versionsAvailable(self):
         versions = [
-            re.search(f'{self.benchName}_(\w+)\.v', p.name).group(1) for p in
-            self.versionsDir.glob(f'{self.benchName}_*.v')
+            re.search(f"{self.benchName}_(\w+)\.v", p.name).group(1)
+            for p in self.versionsDir.glob(f"{self.benchName}_*.v")
         ]
         versions.sort()
         return versions
@@ -316,28 +327,38 @@ class Benchmark:
     def _fullPath(self, ext):
         try:
             if self.version is None:
-                return self.rootDir / f'{self.identifier}.{ext}'
-            return self.versionsDir / f'{self.identifier}.{ext}'
+                return self.rootDir / f"{self.identifier}.{ext}"
+            return self.versionsDir / f"{self.identifier}.{ext}"
         except:
             return None
 
     def __init__(
         self,
         designName,
-        libraryName='saed',
-        techNode='90',
-        libVoltage='typ',
-        libVersion='1p11',
+        libraryName="saed",
+        techNode="90",
+        libVoltage="typ",
+        libVersion="1p11",
         version=None,
         rootDir: Optional[Path] = None,
-        **kwargs
+        **kwargs,
     ):
-        if 'library' in kwargs.keys():
-            library = kwargs['library']
+        if "library" in kwargs.keys():
+            library = kwargs["library"]
             if library is not None:
-                self.libraryName, self.techNode, self.libVoltage, self.libVersion = Benchmark.parseLibraryName(library)
+                (
+                    self.libraryName,
+                    self.techNode,
+                    self.libVoltage,
+                    self.libVersion,
+                ) = Benchmark.parseLibraryName(library)
             else:
-                self.libraryName, self.techNode, self.libVoltage, self.libVersion = None, None, None, None
+                self.libraryName, self.techNode, self.libVoltage, self.libVersion = (
+                    None,
+                    None,
+                    None,
+                    None,
+                )
         else:
             self.libraryName: str = libraryName
             self.techNode: str = techNode
@@ -348,10 +369,12 @@ class Benchmark:
         self.clock: str = self.getBenchmarkClkRst(designName)["clock"]
         self.reset: str = self.getBenchmarkClkRst(designName)["reset"]
         self.version: Optional[str] = version
-        self.rootDir: Path = rootDir.expanduser().resolve() if rootDir is not None else None
+        self.rootDir: Path = (
+            rootDir.expanduser().resolve() if rootDir is not None else None
+        )
 
         if self.rootDir is not None and not self.vPath.exists():
-            raise FileNotFoundError(f'Benchmark not found: {self.vPath}')
+            raise FileNotFoundError(f"Benchmark not found: {self.vPath}")
 
     def withVersion(self, version):
         newBench = copy.deepcopy(self)
@@ -390,6 +413,6 @@ class Benchmark:
             "riscvcore": {"clock": "clk_i", "reset": "rst_i"},
             "top": {"clock": "clock", "reset": "rst"},
             "wbconmax": {"clock": "clock", "reset": "rst_i"},
-            "yacc": {"clock": "clock", "reset": "Async_Reset"}
+            "yacc": {"clock": "clock", "reset": "Async_Reset"},
         }
         return data.get(designName, dict(clock="clock", reset="reset"))
