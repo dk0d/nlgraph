@@ -15,8 +15,8 @@ NETLIST_DIR = RESOURCES_DIR / "netlists"
     "filePath",
     [vPath.as_posix() for vPath in NETLIST_DIR.glob("*.v")],
 )
-def test_parse(filePath):
+def test_graph_from_verilog(filePath):
     graph = Graph.fromVerilog(
         filePath=Path(filePath),
     )
-    assert graph is not None, f"Failed to parse {filePath.name}"
+    assert graph is not None, f"Graph is None: {filePath.name}"
