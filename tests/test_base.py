@@ -1,5 +1,4 @@
 # %%
-import nlgraph as ng
 import pytest
 from pathlib import Path
 from nlgraph.graph import Graph
@@ -21,8 +20,3 @@ def test_parse(filePath):
         filePath=Path(filePath),
     )
     assert graph is not None, f"Failed to parse {filePath.name}"
-
-
-# test_parse()
-
-# print("Done!")
