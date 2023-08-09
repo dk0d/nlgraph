@@ -15,8 +15,13 @@ def test_parse():
     for vPath in NETLIST_DIR.glob("*.v"):
         if "PRESENT" not in vPath.name:
             continue
-        graph = Graph.fromVerilog(filePath=vPath)
+        graph = Graph.fromVerilog(
+            filePath=vPath,
+        )
+
         assert graph is not None, f"Failed to parse {vPath.name}"
 
 
-# test_parse()
+test_parse()
+
+print("Done!")

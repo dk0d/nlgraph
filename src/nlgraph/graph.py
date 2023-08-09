@@ -18,6 +18,8 @@ import torch_geometric.utils as pygeo_utils
 import tqdm
 from torch_geometric.data import Data
 
+from nlgraph.parse.nets import NetType
+
 from .common import RegexConstants
 from .parse.synopsis import ScoapData
 from .utils import NLGraphEnum
@@ -413,6 +415,7 @@ class BaseGraphReader(Protocol):
     assignments: Dict[str, str] = dict()
     moduleName: Optional[str] = None
     library = None
+    infer_undeclared_nets = True
 
     # r"[10]'b[10]"
     BIAS_EXP = RegexConstants.BIAS_EXP
@@ -447,13 +450,14 @@ class BaseGraphReader(Protocol):
     # r"\.([A-z]+\d*)\((.+)\)"
     PORT_DECLARATION_EXP = RegexConstants.PORT_DECLARATION_EXP
 
-    def _initSelf(self, piMode: PIMode):
+    def _initSelf(self, piMode: PIMode, infer_undeclared_nets: bool = True):
         self.nodes: Dict[str, NodeEntry] = dict()
         self.nets: Dict[str, NetEntry] = dict()
         self.ports = set()
         self.assignments: Dict[str, str] = dict()
         self.moduleName = None
         self.library = None
+        self.infer_undeclared_nets = infer_undeclared_nets
         self.piMode = piMode
 
     def rangeValsFromString(self, string):
@@ -504,6 +508,13 @@ class BaseGraphReader(Protocol):
             direction = "output" if portType == "input" else "input"
             self.nodes[nodeEntry.identifier].addPort(net, direction)
 
+    def _checkNet(self, net, netType=NetType.wire):
+        if net not in self.nets:
+            if self.infer_undeclared_nets:
+                self.addNet(net, netType)
+            else:
+                raise UndeclaredNetError(f"Trying to add undeclared net: {net}")
+
     def addModule(self, moduleName, moduleID, portDeclarations):
         node = NodeEntry(name=moduleName, identifier=moduleID)
 
@@ -532,15 +543,11 @@ class BaseGraphReader(Protocol):
                 nodeType = NodeType.fromString(net)
                 self.addBias(nodeType, nodeType.name)
             elif node.portIsInput(pin):
-                try:
-                    self.nets[net].goingTo.add(nodePort)
-                except KeyError:
-                    raise UndeclaredNetError(f"Trying to add undeclared net: {net}")
+                self._checkNet(net, NetType.wire)
+                self.nets[net].goingTo.add(nodePort)
             elif node.portIsOutput(pin):
-                try:
-                    self.nets[net].leavingFrom.add(nodePort)
-                except KeyError:
-                    raise UndeclaredNetError(f"Trying to add undeclared net: {net}")
+                self._checkNet(net, NetType.wire)
+                self.nets[net].leavingFrom.add(nodePort)
                 if len(self.nets[net].leavingFrom) > 1:
                     raise Exception(f"Defining more than 1 output for net {net}")
             else:
@@ -1640,14 +1647,15 @@ class Graph(object):
     @staticmethod
     def fromVerilog(
         filePath: Path,
-        scoapPath: Path = None,
-        switchingPath: Path = None,
-        faultPath: Path = None,
-        libraryPath: Path = None,
+        scoapPath: Path | None = None,
+        switchingPath: Path | None = None,
+        faultPath: Path | None = None,
+        libraryPath: Path | None = None,
         verbose=False,
         printSummaryTable=False,
         primaryIOmode: PIMode = PIMode.netMatch,
         ffDepthMode="zero",
+        shouldCalcLogicDepth=False,
     ) -> Graph:
         """
         This function primarily takes in a verilog file and returns a Graph
@@ -1659,9 +1667,13 @@ class Graph(object):
             faultPath (Path): path to the fault report file (optional)
             libraryPath (Path): path to library file to load module types (optional)
             verbose (bool): flag for verbose output, i.e. logging
-            printSummaryTable (bool): prints a summary of the read graph as a pandas DataFrame
-            primaryIOmode (PIMode): ['per-net','single'], defaults to 'per-net'. if 'single', creates a single primary input node and a single primary output node,
-                each port is connected to a PI/PO net.  if 'per-net', each net gets a PI/PO node and is only connected to that net
+            printSummaryTable (bool): prints a summary of the read graph as
+                a pandas DataFrame
+            primaryIOmode (PIMode): ['per-net','single'], defaults to 'per-net'.
+                if 'single', creates a single primary input node and a single
+                primary output node, each port is connected to a PI/PO net.
+                if 'per-net', each net gets a PI/PO node and is only connected
+                to that net.
             ffDepthMode (str): 'zero' or 'relative'
 
 
@@ -1707,9 +1719,10 @@ class Graph(object):
         elif verbose:
             print(f"WARNING: No FAULT data provided for {filePath.name}")
 
-        depths = calcLogicDepth(graph, timeit=verbose, ffDepthMode=ffDepthMode)
-        for n, d in depths.items():
-            graph.nodes[n]["logicDepth"] = d
+        if shouldCalcLogicDepth:
+            depths = calcLogicDepth(graph, timeit=verbose, ffDepthMode=ffDepthMode)
+            for n, d in depths.items():
+                graph.nodes[n]["logicDepth"] = d
 
         return graph
 
@@ -2076,7 +2089,7 @@ class Graph(object):
         curvedPaths=True,
         figSize=(10, 7),
         nodeFilter=None,
-        savePath: Path = None,
+        savePath: Path | None = None,
     ):
         """
 
@@ -2297,9 +2310,11 @@ class Graph(object):
                     curvedPaths=curvedPaths,
                     nodeLabelNudge=nodeLabelNudge,
                     figSize=figsize,
-                    savePath=saveDir / f"{self.name}_{root}.pdf"
-                    if saveDir is not None
-                    else None,
+                    savePath=(
+                        saveDir / f"{self.name}_{root}.pdf"
+                        if saveDir is not None
+                        else None
+                    ),
                 )
                 Graph.drawGraph(
                     tree,
@@ -2311,9 +2326,11 @@ class Graph(object):
                     curvedPaths=curvedPaths,
                     nodeLabelNudge=nodeLabelNudge,
                     figSize=figsize,
-                    savePath=saveDir / f"{self.name}_{root}_tree.pdf"
-                    if saveDir is not None
-                    else None,
+                    savePath=(
+                        saveDir / f"{self.name}_{root}_tree.pdf"
+                        if saveDir is not None
+                        else None
+                    ),
                 )
 
     def draw(
