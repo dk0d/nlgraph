@@ -28,7 +28,6 @@ PortID = str
 
 
 class GraphDataFactory(Protocol):
-
     @staticmethod
     def fromData(data: Data):
         raise NotImplementedError
@@ -40,7 +39,7 @@ class NodePort:
     port: PortID
 
     def __repr__(self):
-        return f'{self.nodeId}/{self.port}'
+        return f"{self.nodeId}/{self.port}"
 
     def __str__(self):
         return self.__repr__()
@@ -52,29 +51,29 @@ class NodeType(str, NLGraphEnum):
 
     """
 
-    and_ = ('and', r'[^n]and|^and')
-    nor = ('nor', r'nor')
-    inv = ('inv', r'inv|hi\ds\d|^i\ds\d')
-    nand = ('nand', r'nand|nnd\d')
-    or_ = ('or', r'[^xn]or|^or')
-    xor = ('xor', r'xor')
+    and_ = ("and", r"[^n]and|^and")
+    nor = ("nor", r"nor")
+    inv = ("inv", r"inv|hi\ds\d|^i\ds\d")
+    nand = ("nand", r"nand|nnd\d")
+    or_ = ("or", r"[^xn]or|^or")
+    xor = ("xor", r"xor")
 
-    input = ('input', r'in(put)?|__PI__')
-    output = ('output', r'out(put)?|__PO__')
-    buffer = ('buffer', r'buf|nb\d|^hnb\d')
+    input = ("input", r"in(put)?|__PI__")
+    output = ("output", r"out(put)?|__PO__")
+    buffer = ("buffer", r"buf|nb\d|^hnb\d")
 
-    xnor = ('xnor', r'xnor|xnr')
-    ff = ('dff', r'[^s]dff|^ff|^dff')
-    scanff = ('sdff', r'sdff|sff')
-    bufferInv = ('bufferinv', r'^hib\ds\d|^ib\d\w\d')
-    or_and = ('or_and', r'oa')
-    and_or = ('and_or', r'ao')
-    mux = ('mux', r'mux|mx')
+    xnor = ("xnor", r"xnor|xnr")
+    ff = ("dff", r"[^s]dff|^ff|^dff")
+    scanff = ("sdff", r"sdff|sff")
+    bufferInv = ("bufferinv", r"^hib\ds\d|^ib\d\w\d")
+    or_and = ("or_and", r"oa")
+    and_or = ("and_or", r"ao")
+    mux = ("mux", r"mux|mx")
     # latch = ('latch', r'latch')
 
-    bias0 = ('bias0', r"1'b0")
-    bias1 = ('bias1', r"1'b1")
-    adder = ('adder', r'add')
+    bias0 = ("bias0", r"1'b0")
+    bias1 = ("bias1", r"1'b1")
+    adder = ("adder", r"add")
 
     @property
     def isFF(self):
@@ -89,7 +88,7 @@ class NodeType(str, NLGraphEnum):
         return self == NodeType.input
 
     def __lt__(self, other):
-        if hasattr(NodeType, 'input') and hasattr(NodeType, 'output'):
+        if hasattr(NodeType, "input") and hasattr(NodeType, "output"):
             if self == NodeType.input or other == NodeType.output:
                 return True
             elif other == NodeType.input or self == NodeType.output:
@@ -97,7 +96,7 @@ class NodeType(str, NLGraphEnum):
         return self.value < other.value
 
     def __le__(self, other):
-        if hasattr(NodeType, 'input') and hasattr(NodeType, 'output'):
+        if hasattr(NodeType, "input") and hasattr(NodeType, "output"):
             if self == NodeType.input or other == NodeType.output:
                 return True
             elif other == NodeType.input or self == NodeType.output:
@@ -105,7 +104,7 @@ class NodeType(str, NLGraphEnum):
         return self.value <= other.value
 
     def __gt__(self, other):
-        if hasattr(NodeType, 'output'):
+        if hasattr(NodeType, "output"):
             if self == NodeType.output:
                 return True
             elif other == NodeType.output:
@@ -113,7 +112,7 @@ class NodeType(str, NLGraphEnum):
         return self.value > other.value
 
     def __ge__(self, other):
-        if hasattr(NodeType, 'output'):
+        if hasattr(NodeType, "output"):
             if self == NodeType.output:
                 return True
             elif other == NodeType.output:
@@ -122,114 +121,109 @@ class NodeType(str, NLGraphEnum):
 
 
 class NodeAttributes(dict):
-
     @property
     def faultCounts(self):
-        return self['faultCounts']
+        return self["faultCounts"]
 
     @staticmethod
     def defaultControlPointAttributes():
-        return NodeAttributes(
-            logicDepth=0,
-            control0=1,
-            control1=1,
-            observe=2
-        )
+        return NodeAttributes(logicDepth=0, control0=1, control1=1, observe=2)
 
     @property
     def moduleName(self):
-        return self.get('moduleName', None)
+        return self.get("moduleName", None)
 
     @property
     def nodeType(self) -> NodeType:
-        return self.get('nodeType', None)
+        return self.get("nodeType", None)
 
     @property
     def ports(self):
-        p = self.get('ports', None)
+        p = self.get("ports", None)
         if p is None:
-            self['ports'] = set()
-        return self['ports']
+            self["ports"] = set()
+        return self["ports"]
 
     @property
     def portDirections(self):
-        p = self.get('portDirections', None)
+        p = self.get("portDirections", None)
         if p is None:
-            self['portDirections'] = set()
-        return self['portDirections']
+            self["portDirections"] = set()
+        return self["portDirections"]
 
     def addPort(self, port):
-        if 'ports' not in self.keys():
-            self['ports'] = set()
-        self['ports'].add(port)
+        if "ports" not in self.keys():
+            self["ports"] = set()
+        self["ports"].add(port)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # self.node_type: NodeType = NodeType(kwargs.get('node_type', None))
-        self['faultCounts'] = {}
+        self["faultCounts"] = {}
 
         if self.moduleName is not None and self.nodeType is None:
-            self['nodeType'] = NodeType.fromString(self.moduleName)
+            self["nodeType"] = NodeType.fromString(self.moduleName)
 
     def __hash__(self):
-        return hash(f'{self.__str__()} {self.__dict__}')
+        return hash(f"{self.__str__()} {self.__dict__}")
 
 
 # class EdgeType(Enum):
 #     scan = "scan"
 
-class EdgeAttributes(dict):
 
+class EdgeAttributes(dict):
     @property
     def nets(self):
-        return self['nets']
+        return self["nets"]
 
     @property
     def sourcePort(self):
-        return self['sourcePort']
+        return self["sourcePort"]
 
     @property
     def targetPort(self):
-        return self['targetPort']
+        return self["targetPort"]
 
     def __init__(self, nets: set, sourcePort=None, targetPort=None, **kwargs):
         super().__init__(**kwargs)
-        self['nets'] = nets
-        self['sourcePort'] = sourcePort
-        self['targetPort'] = targetPort
+        self["nets"] = nets
+        self["sourcePort"] = sourcePort
+        self["targetPort"] = targetPort
         # self.switching_probability: Optional[float] = kwargs.get('switching_probability', None)
 
     def __str__(self):
-        nets = self.get('nets', set())
+        nets = self.get("nets", set())
         if len(nets) > 0:
-            out = ",".join([f'{nId}' for nId, nType in nets])
+            out = ",".join([f"{nId}" for nId, nType in nets])
         else:
-            out = 'EdgeAttribute()'
+            out = "EdgeAttribute()"
         return out
 
     def __repr__(self):
         return self.__str__()
 
     def __hash__(self):
-        return hash(f'{self.__str__()} {self.__dict__}')
+        return hash(f"{self.__str__()} {self.__dict__}")
 
 
 class GraphAttributes(dict):
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     def __hash__(self):
-        return hash(f'{self.__dict__}')
+        return hash(f"{self.__dict__}")
 
 
-GraphLabelerFunc = Callable[[Union[GraphAttributes, NodeAttributes, EdgeAttributes]], Union[float, int]]
+GraphLabelerFunc = Callable[
+    [Union[GraphAttributes, NodeAttributes, EdgeAttributes]], Union[float, int]
+]
 
 
 class GraphLabelMode(Enum):
-    node = 'node'
-    graph = 'graph'
-    edge = 'edge'
+    node = "node"
+    graph = "graph"
+    edge = "edge"
 
 
 class NodeEntry:
@@ -247,7 +241,7 @@ class NodeEntry:
 
     @property
     def moduleName(self):
-        return self.attributes.get('moduleName', None)
+        return self.attributes.get("moduleName", None)
 
     @property
     def ports(self):
@@ -272,17 +266,17 @@ class NodeEntry:
                 isIn = re.fullmatch(IN_EXP, p) is not None
                 isOut = re.fullmatch(OUT_EXP, p) is not None
                 valid = isIn != isOut
-                assert valid, f'Error in expressions, equivalence for port: {port}'
-                return 'input' if isIn else 'output'
+                assert valid, f"Error in expressions, equivalence for port: {port}"
+                return "input" if isIn else "output"
             return direction
         except KeyError:
-            raise Exception(f'Port not on node: {port}')
+            raise Exception(f"Port not on node: {port}")
 
     def portIsInput(self, port):
-        return self.portDirection(port) == 'input'
+        return self.portDirection(port) == "input"
 
     def portIsOutput(self, port):
-        return self.portDirection(port) == 'output'
+        return self.portDirection(port) == "output"
 
     def __init__(
         self,
@@ -290,7 +284,6 @@ class NodeEntry:
         identifier: NodeID,
         nodeType: NodeType = None,
     ):
-
         self.identifier = identifier
 
         if name is not None and nodeType is None:
@@ -302,8 +295,8 @@ class NodeEntry:
             moduleName=name,
             identifier=self.identifier,
             nodeType=_nodeType,
-            isKeyed=int(re.search(r'key', name.lower()) is not None),
-            ports=OrderedDict()
+            isKeyed=int(re.search(r"key", name.lower()) is not None),
+            ports=OrderedDict(),
         )
 
     def addPort(self, port, direction=None):
@@ -311,9 +304,9 @@ class NodeEntry:
 
 
 class PIMode(Enum):
-    single = 'single'
-    primaryLabeled = 'primaryLabeled'
-    netMatch = 'netMatch'
+    single = "single"
+    primaryLabeled = "primaryLabeled"
+    netMatch = "netMatch"
 
 
 class NetEntry:
@@ -335,18 +328,18 @@ class NetEntry:
         self.goingTo = goingTo
         self.aliases = set()
 
-        if self.netType == 'input':
+        if self.netType == "input":
             self.leavingFrom.add(
                 NodePort(
-                    nodeIdForPrimaryIO('pi', self.identifier, piMode),
-                    self.identifier
-                ))
-        elif self.netType == 'output':
+                    nodeIdForPrimaryIO("pi", self.identifier, piMode), self.identifier
+                )
+            )
+        elif self.netType == "output":
             self.goingTo.add(
                 NodePort(
-                    nodeIdForPrimaryIO('po', self.identifier, piMode),
-                    self.identifier
-                ))
+                    nodeIdForPrimaryIO("po", self.identifier, piMode), self.identifier
+                )
+            )
 
     def addAlias(self, aliasIdentifier):
         if self.identifier != aliasIdentifier:
@@ -371,38 +364,40 @@ def nodeIdForPrimaryIO(io, net, primaryIOmode: PIMode):
     Returns:
 
     """
-    if io.lower() in ['pi', 'po']:
+    if io.lower() in ["pi", "po"]:
         if primaryIOmode == PIMode.single:
-            return f'__{io.upper()}__'
+            return f"__{io.upper()}__"
         elif PIMode == PIMode.primaryLabeled:
-            return f'__{io.upper()}__{net}'
-        return f'{net}'
+            return f"__{io.upper()}__{net}"
+        return f"{net}"
     return net
 
 
 def parseLibrary(path: Path):
     netlist = path.read_text()
-    netlist = re.sub('\n', ' ', netlist)
-    entries = re.findall(r"(module|input|output)\s+([_\w,\s\[\]]+)\s*;?|(endmodule)", netlist)
+    netlist = re.sub("\n", " ", netlist)
+    entries = re.findall(
+        r"(module|input|output)\s+([_\w,\s\[\]]+)\s*;?|(endmodule)", netlist
+    )
     modules = {}
     activeModule = None
     for e0, e1, e2 in entries:
-        if e0 == 'module':
-            activeModule = e1.strip(' \n()')
+        if e0 == "module":
+            activeModule = e1.strip(" \n()")
             modules[activeModule] = dict(inputs=[], outputs=[])
-        elif e0 == 'input':
+        elif e0 == "input":
             try:
-                ports = [i.strip(' ') for i in e1.split(',')]
-                modules[activeModule]['inputs'].extend(ports)
+                ports = [i.strip(" ") for i in e1.split(",")]
+                modules[activeModule]["inputs"].extend(ports)
             except KeyError:
                 pass
-        elif e0 == 'output':
+        elif e0 == "output":
             try:
-                ports = [o.strip(' ') for o in e1.split(',')]
-                modules[activeModule]['outputs'].extend(ports)
+                ports = [o.strip(" ") for o in e1.split(",")]
+                modules[activeModule]["outputs"].extend(ports)
             except KeyError:
                 pass
-        elif e2 == 'endmodule':
+        elif e2 == "endmodule":
             activeModule = None
     return modules
 
@@ -458,7 +453,7 @@ class BaseGraphReader(Protocol):
         self.piMode = piMode
 
     def rangeValsFromString(self, string):
-        numVals = [int(s.strip('[]()')) for s in string.split(':')]
+        numVals = [int(s.strip("[]()")) for s in string.split(":")]
         numVals = [int(n) for n in numVals]
         numVals.sort()
         return numVals
@@ -466,11 +461,11 @@ class BaseGraphReader(Protocol):
     def createNetsFromRange(self, netBaseNames, rangeCtx):
         numVals = self.rangeValsFromString(rangeCtx.getText())
         if len(numVals) != 2:
-            raise Exception(f'Invalid number of dimensions {numVals}')
+            raise Exception(f"Invalid number of dimensions {numVals}")
         _nets = set([])
         for net in netBaseNames:
             for i in range(numVals[0], numVals[1] + 1):
-                _nets.add(f'{net}[{i}]')
+                _nets.add(f"{net}[{i}]")
         return _nets
 
     def addNet(self, netIdentifier, netType):
@@ -479,51 +474,46 @@ class BaseGraphReader(Protocol):
             self.nets[originalNetIdentifier].addAlias(netIdentifier)
         except KeyError:
             if self.nets.get(netIdentifier, None) is None:
-                self.nets[netIdentifier] = NetEntry(identifier=netIdentifier, netType=netType, piMode=self.piMode)
+                self.nets[netIdentifier] = NetEntry(
+                    identifier=netIdentifier, netType=netType, piMode=self.piMode
+                )
 
     def addInOutNetNodes(self, ports, portType):
         for net in ports:
             if net not in self.nets.keys():
                 self.addNet(netIdentifier=net, netType=portType)
             nid = nodeIdForPrimaryIO(
-                'pi' if portType == 'input' else 'po',
-                net,
-                self.piMode
+                "pi" if portType == "input" else "po", net, self.piMode
             )
 
-            if portType == 'input':
+            if portType == "input":
                 ntype = NodeType.input
-            elif portType == 'output':
+            elif portType == "output":
                 ntype = NodeType.output
             else:
                 # NodeEntry will try to figure out based on node ID
                 ntype = None
 
-            nodeEntry = NodeEntry(
-                name=nid,
-                identifier=nid,
-                nodeType=ntype
-            )
+            nodeEntry = NodeEntry(name=nid, identifier=nid, nodeType=ntype)
             if nodeEntry.identifier not in self.nodes.keys():
                 self.nodes[nodeEntry.identifier] = nodeEntry
-            direction = 'output' if portType == 'input' else 'input'
+            direction = "output" if portType == "input" else "input"
             self.nodes[nodeEntry.identifier].addPort(net, direction)
 
     def addModule(self, moduleName, moduleID, portDeclarations):
-
         node = NodeEntry(name=moduleName, identifier=moduleID)
 
         if self.library is not None:
-            for i in self.library[moduleName]['inputs']:
-                node.addPort(i, 'input')
-            for o in self.library[moduleName]['outputs']:
-                node.addPort(o, 'output')
+            for i in self.library[moduleName]["inputs"]:
+                node.addPort(i, "input")
+            for o in self.library[moduleName]["outputs"]:
+                node.addPort(o, "output")
 
         for portDec in portDeclarations:
             matches = re.search(self.PORT_DECLARATION_EXP, portDec)
             pin, net = matches.groups()
-            pin = pin.strip(' ')
-            net = net.strip(' ')
+            pin = pin.strip(" ")
+            net = net.strip(" ")
             if pin not in node.ports.keys():
                 node.addPort(pin, None)
 
@@ -542,12 +532,14 @@ class BaseGraphReader(Protocol):
             elif node.portIsOutput(pin):
                 self.nets[net].leavingFrom.add(nodePort)
                 if len(self.nets[net].leavingFrom) > 1:
-                    raise Exception(f'Defining more than 1 output for net {net}')
+                    raise Exception(f"Defining more than 1 output for net {net}")
             else:
-                raise Exception(f'unsupported port {pin}')
+                raise Exception(f"unsupported port {pin}")
 
         if node.identifier in self.nodes.keys():
-            raise Exception(f'node already present in node list: ({node.moduleName}, {node.identifier})')
+            raise Exception(
+                f"node already present in node list: ({node.moduleName}, {node.identifier})"
+            )
 
         self.nodes[node.identifier] = node
 
@@ -560,10 +552,14 @@ class BaseGraphReader(Protocol):
             return
 
         if nodeType.name not in self.nodes.keys():
-            self.nodes[nodeType.name] = NodeEntry(nodeType.name, nodeType.value, nodeType)
+            self.nodes[nodeType.name] = NodeEntry(
+                nodeType.name, nodeType.value, nodeType
+            )
 
         if nodeType.name not in self.nets.keys():
-            self.nets[nodeType.name] = NetEntry(nodeType.name, nodeType.input.value, piMode=self.piMode)
+            self.nets[nodeType.name] = NetEntry(
+                nodeType.name, nodeType.input.value, piMode=self.piMode
+            )
 
         if netID not in self.nets.keys():
             self.nets[netID] = NetEntry(netID, nodeType.value, piMode=self.piMode)
@@ -572,7 +568,7 @@ class BaseGraphReader(Protocol):
 
     def addAssignment(self, assignment: Union[str, tuple]):
         if isinstance(assignment, str):
-            assignedTo, identifier = assignment.split('=')
+            assignedTo, identifier = assignment.split("=")
         else:
             assignedTo, identifier = assignment
 
@@ -599,7 +595,6 @@ class BaseGraphReader(Protocol):
 
 
 class RegExpReader(BaseGraphReader):
-
     def __init__(self, piMode: PIMode, verbose=False):
         self._initSelf(piMode=piMode)
         self.verbose = verbose
@@ -609,18 +604,20 @@ class RegExpReader(BaseGraphReader):
         for i in inputs:
             bits, _nets = i
             if len(bits) > 0:
-                r = [int(b.strip('\n ')) for b in bits.split(':')]
+                r = [int(b.strip("\n ")) for b in bits.split(":")]
                 r.sort()
                 nLow, nHigh = r
             else:
                 nLow, nHigh = None, None
 
-            if ',' in _nets and nHigh is None:
-                _nets = [m.strip('\n ') for m in _nets.split(',')]
-            elif nHigh is not None and nLow is not None:
-                _nets = [f'{_nets}[{n}]' for n in range(nLow, nHigh + 1)]
+            if "," in _nets:
+                _nets = [m for m in re.sub(r"[\s\n]+", "", _nets).split(",")]
             else:
                 _nets = [_nets]
+
+            if nHigh is not None and nLow is not None:
+                _nets = [f"{net}[{n}]" for net in _nets for n in range(nLow, nHigh + 1)]
+
             ins.extend(_nets)
         return ins
 
@@ -631,7 +628,7 @@ class RegExpReader(BaseGraphReader):
 
     def parseGateNetlistFile(self, path: Path, libraryPath: Path = None, verbose=False):
         netlist = path.read_text()
-        netlist = re.sub('\n', ' ', netlist)
+        netlist = re.sub("\n", " ", netlist)
 
         self.library = None if libraryPath is None else parseLibrary(libraryPath)
 
@@ -644,24 +641,26 @@ class RegExpReader(BaseGraphReader):
         entries = re.findall(self.ENTRY_EXP, netlist)
         wires = re.findall(self.WIRE_EXP, netlist)
 
-        self.addInOutNetNodes(self.processInOutWire(inputs), 'input')
-        self.addInOutNetNodes(self.processInOutWire(outputs), 'output')
+        self.addInOutNetNodes(self.processInOutWire(inputs), "input")
+        self.addInOutNetNodes(self.processInOutWire(outputs), "output")
 
         for w in self.processInOutWire(wires):
-            self.addNet(w, 'wire')
+            self.addNet(w, "wire")
 
         for assignment in assigns:
             # TODO: Handle assignment of biases
             self.addAssignment(assignment)
 
         if verbose:
-            entries = tqdm.tqdm(entries, desc=f'Reading {path.name}')
+            entries = tqdm.tqdm(entries, desc=f"Reading {path.name}")
 
         for entry in entries:
             moduleName, identifier, portlist = entry
-            if 'module' == moduleName:
+            if "module" == moduleName:
                 continue
-            self.addModule(moduleName, identifier, [p.strip(' ') for p in portlist.split(',')])
+            self.addModule(
+                moduleName, identifier, [p.strip(" ") for p in portlist.split(",")]
+            )
 
         # Resolve aliased input and output nets
         for assignedTo, identifier in self.assignments.items():
@@ -669,37 +668,37 @@ class RegExpReader(BaseGraphReader):
             for a in net.aliases:
                 aliasNet = self.nets[a]
 
-                if net.netType == 'input' and aliasNet.netType == 'output':
+                if net.netType == "input" and aliasNet.netType == "output":
                     net.goingTo.update(aliasNet.goingTo)
                     aliasNet.leavingFrom.update(net.leavingFrom)
-                elif net.netType == 'input' and aliasNet.netType == 'wire':
+                elif net.netType == "input" and aliasNet.netType == "wire":
                     net.goingTo.update(aliasNet.goingTo)
                     aliasNet.leavingFrom.update(net.leavingFrom)
                     aliasNet.goingTo.update(net.goingTo)
-                elif net.netType == 'input' and aliasNet.netType == 'input':
+                elif net.netType == "input" and aliasNet.netType == "input":
                     net.goingTo.update(aliasNet.goingTo)
                     aliasNet.goingTo.update(net.goingTo)
 
-                elif net.netType == 'output' and aliasNet.netType == 'input':
+                elif net.netType == "output" and aliasNet.netType == "input":
                     net.leavingFrom.update(aliasNet.leavingFrom)
                     aliasNet.goingTo.update(net.goingTo)
-                elif net.netType == 'output' and aliasNet.netType == 'wire':
+                elif net.netType == "output" and aliasNet.netType == "wire":
                     net.leavingFrom.update(aliasNet.leavingFrom)
                     aliasNet.leavingFrom.update(net.leavingFrom)
                     aliasNet.goingTo.update(net.goingTo)
-                elif net.netType == 'output' and aliasNet.netType == 'output':
+                elif net.netType == "output" and aliasNet.netType == "output":
                     net.leavingFrom.update(aliasNet.leavingFrom)
                     aliasNet.leavingFrom.update(net.leavingFrom)
 
-                elif net.netType == 'wire' and aliasNet.netType == 'input':
+                elif net.netType == "wire" and aliasNet.netType == "input":
                     aliasNet.goingTo.update(net.goingTo)
                     net.goingTo.update(aliasNet.goingTo)
                     net.leavingFrom.update(aliasNet.leavingFrom)
-                elif net.netType == 'wire' and aliasNet.netType == 'output':
+                elif net.netType == "wire" and aliasNet.netType == "output":
                     aliasNet.leavingFrom.update(net.leavingFrom)
                     net.leavingFrom.update(aliasNet.leavingFrom)
                     net.goingTo.update(aliasNet.goingTo)
-                elif net.netType == 'wire' and aliasNet.netType == 'wire':
+                elif net.netType == "wire" and aliasNet.netType == "wire":
                     net.leavingFrom.update(aliasNet.leavingFrom)
                     aliasNet.leavingFrom.update(net.leavingFrom)
                     net.goingTo.update(aliasNet.goingTo)
@@ -713,8 +712,8 @@ class RegExpReader(BaseGraphReader):
 
 
 class StuckAtFaultType(Enum):
-    stuck_at_0 = 'sa0'
-    stuck_at_1 = 'sa1'
+    stuck_at_0 = "sa0"
+    stuck_at_1 = "sa1"
 
     def __str__(self):
         return self.value
@@ -731,40 +730,40 @@ class StuckAtFaultType(Enum):
 
 class ATPGFaultType(Enum):
     # major classes
-    detected = 'DT'
-    possiblyDetected = 'PT'
-    undetectable = 'UD'
-    atpgUntestable = 'AU'
-    notDetected = 'ND'
+    detected = "DT"
+    possiblyDetected = "PT"
+    undetectable = "UD"
+    atpgUntestable = "AU"
+    notDetected = "ND"
 
     # Detected Subclasses
-    detectedBySim = 'DS'
-    detectedByImp = 'DI'
+    detectedBySim = "DS"
+    detectedByImp = "DI"
 
     # Possibly detected subclasses
-    atpgUntestablePossiblyDetected = 'AP'
-    notAnalyzedPossiblyDetected = 'NP'
+    atpgUntestablePossiblyDetected = "AP"
+    notAnalyzedPossiblyDetected = "NP"
 
     # Undetectable subclasses
-    undetectableUnused = 'UU'
-    undetectableUnobserved = 'UO'
-    undetectableTied = 'UT'
-    undetectableBlocked = 'UB'
-    undetectableRedundant = 'UR'
+    undetectableUnused = "UU"
+    undetectableUnobserved = "UO"
+    undetectableTied = "UT"
+    undetectableBlocked = "UB"
+    undetectableRedundant = "UR"
 
     # ATPG untestable subclasses
-    atpgUntestableNotDetected = 'AN'
+    atpgUntestableNotDetected = "AN"
 
     # Not Detected subclasses
-    notControlled = 'NC'
-    notObserved = 'NO'
+    notControlled = "NC"
+    notObserved = "NO"
 
     @property
     def isDetected(self) -> bool:
         return self in [
             ATPGFaultType.detected,
             ATPGFaultType.detectedBySim,
-            ATPGFaultType.detectedByImp
+            ATPGFaultType.detectedByImp,
         ]
 
     @property
@@ -783,21 +782,21 @@ class ATPGFaultType(Enum):
             ATPGFaultType.undetectableUnobserved,
             ATPGFaultType.undetectableTied,
             ATPGFaultType.undetectableBlocked,
-            ATPGFaultType.undetectableRedundant
+            ATPGFaultType.undetectableRedundant,
         ]
 
     @property
     def isUntestable(self):
         return self in [
             ATPGFaultType.atpgUntestable,
-            ATPGFaultType.atpgUntestableNotDetected
+            ATPGFaultType.atpgUntestableNotDetected,
         ]
 
     @property
     def isNotDetected(self) -> bool:
         return self in [
             ATPGFaultType.notDetected,
-            ATPGFaultType.atpgUntestableNotDetected
+            ATPGFaultType.atpgUntestableNotDetected,
         ]
 
     def __repr__(self):
@@ -814,9 +813,9 @@ class ATPGFaultType(Enum):
 
 
 class GraphType(Enum):
-    undirected = 'undirected'
-    directed = 'directed'
-    directedAcyclic = 'directedAcyclic'
+    undirected = "undirected"
+    directed = "directed"
+    directedAcyclic = "directedAcyclic"
 
     def __str__(self):
         return self.value
@@ -853,18 +852,18 @@ class GraphLayout:
     #             return gt_draw.sfdp_layout
 
     class nx(Enum):
-        kamada = 'kamada'
-        spring = 'spring'
-        fruchterman = 'fruchterman'
-        planar = 'planar'
-        shell = 'shell'
-        spectral = 'spectral'
-        spiral = 'spiral'
-        circular = 'circular'
-        random = 'random'
-        rescale = 'rescale'
-        bipartite = 'bipartite'
-        multipartite = 'multipartite'
+        kamada = "kamada"
+        spring = "spring"
+        fruchterman = "fruchterman"
+        planar = "planar"
+        shell = "shell"
+        spectral = "spectral"
+        spiral = "spiral"
+        circular = "circular"
+        random = "random"
+        rescale = "rescale"
+        bipartite = "bipartite"
+        multipartite = "multipartite"
 
         @property
         def func(self):
@@ -921,51 +920,54 @@ class DataHelpers:
         """
 
         # switchingPath = Path('unittests/switching/wb_conmax_top_power.out')
-        switchingText = path.read_text().split('\n')
+        switchingText = path.read_text().split("\n")
         startLine = None
         endLine = None
         for i, line in enumerate(switchingText):
-            if re.search(r'Net\s+Net\s+Load\s+Prob\.\s+Rate\s+Power\s+Attrs', line) is not None:
+            if (
+                re.search(r"Net\s+Net\s+Load\s+Prob\.\s+Rate\s+Power\s+Attrs", line)
+                is not None
+            ):
                 startLine = i + 2
                 break
 
         for i in range(len(switchingText) - 1, 0, -1):
             line = switchingText[i]
-            if re.search(r'-+', line):
+            if re.search(r"-+", line):
                 endLine = i
                 break
 
         dataLines = switchingText[startLine:endLine]
         splitData = []
         for line in dataLines:
-            splitData.append(re.split(r'\s+', line))
+            splitData.append(re.split(r"\s+", line))
         data = pd.DataFrame(
             splitData,
             columns=[
-                'net',
-                'totalNetLoad',
-                'staticProb',
-                'toggleRate',
-                'switchingPower',
-                'attrs'
-            ]
+                "net",
+                "totalNetLoad",
+                "staticProb",
+                "toggleRate",
+                "switchingPower",
+                "attrs",
+            ],
         )
         # Resolve single entry split into 2 lines
         removeRows = []
         for i, row in data.iterrows():
-            if row['net'] == '':
+            if row["net"] == "":
                 removeRows.append(i)
                 r = 1
                 c = 0
                 while not pd.isna(data.iloc[i - 1, c]):
                     c += 1
-                while pd.isna(data.iloc[i, r]) or data.iloc[i, r] == '':
+                while pd.isna(data.iloc[i, r]) or data.iloc[i, r] == "":
                     r += 1
                 for ci in range(c, len(data.columns)):
                     data.iloc[i - 1, ci] = data.iloc[i, r]
                     r += 1
         data = data.drop(removeRows).reset_index(drop=True)
-        data = data.apply(pd.to_numeric, errors='ignore')
+        data = data.apply(pd.to_numeric, errors="ignore")
         return data
 
     @staticmethod
@@ -981,8 +983,15 @@ class DataHelpers:
         :return: A pandas dataframe containing the fault report data
         """
         s = path.read_text()
-        tokens = [{k: v for k, v in zip(['stuckAt', 'faultType', 'pin'], re.split(r'\s+', _s.strip('\n{} ')))} for _s in
-                  re.split(r'\n', s)]
+        tokens = [
+            {
+                k: v
+                for k, v in zip(
+                    ["stuckAt", "faultType", "pin"], re.split(r"\s+", _s.strip("\n{} "))
+                )
+            }
+            for _s in re.split(r"\n", s)
+        ]
 
         # if len(tokens) % 3 != 0:
         #     print(f"tokens not in tuples of 3")
@@ -991,8 +1000,8 @@ class DataHelpers:
         data.dropna(inplace=True)
         data.stuckAt = data.stuckAt.apply(lambda x: StuckAtFaultType(x))
         data.faultType = data.faultType.apply(lambda x: ATPGFaultType(x))
-        data.sort_values(by='pin', inplace=True)
-        data = data[['pin', 'stuckAt', 'faultType']]
+        data.sort_values(by="pin", inplace=True)
+        data = data[["pin", "stuckAt", "faultType"]]
         return data
 
 
@@ -1023,6 +1032,7 @@ class DataHelpers:
 #
 #         # print(f"---- disc. {u} {self.properties[u]['identifier']:<15} {self.depths[uId]:>4} {neighbors}")
 
+
 def _stringsFromNodeList(nList, graphReader):
     nodes = [f"{n} ({graphReader.nodes[n.nodeId].nodeType.value})" for n in nList]
     if len(nodes) == 1:
@@ -1030,11 +1040,11 @@ def _stringsFromNodeList(nList, graphReader):
     return nodes
 
 
-def __def_weight(u, v, data, weight='weight'):
+def __def_weight(u, v, data, weight="weight"):
     return data.get(weight, 1)
 
 
-def __def_weight_multi(u, v, d, weight='weight'):
+def __def_weight_multi(u, v, d, weight="weight"):
     return min(attr.get(weight, 1) for attr in d.values())
 
 
@@ -1095,7 +1105,11 @@ def netlist_bfs_edges(
         while queue:
             _parent, depth_now, currDepth, _children = queue[0]
             depths[_parent] = currDepth
-            forcedLeaf = _consider_leaf(_parent, _G.nodes[_parent]) if _consider_leaf is not None else False
+            forcedLeaf = (
+                _consider_leaf(_parent, _G.nodes[_parent])
+                if _consider_leaf is not None
+                else False
+            )
             try:
                 child = next(_children)
                 if _skip is not None and _skip(child, _G.nodes[child]):
@@ -1109,20 +1123,24 @@ def netlist_bfs_edges(
                     yield _parent, child
                     visited.add(child)
                     if depth_now > 1:
-                        queue.append((child, depth_now - 1, currDepth + 1, _neighbors(child)))
+                        queue.append(
+                            (child, depth_now - 1, currDepth + 1, _neighbors(child))
+                        )
             except StopIteration:
                 queue.popleft()
 
-    return _netlist_generic_bfs_edges(
-        _G=G,
-        _source=source,
-        _neighbors=successors,
-        _skip=skip,
-        _consider_leaf=consider_leaf,
-        _depth_limit=depth_limit,
-        _sort_neighbors=sort_neighbors,
-
-    ), depths
+    return (
+        _netlist_generic_bfs_edges(
+            _G=G,
+            _source=source,
+            _neighbors=successors,
+            _skip=skip,
+            _consider_leaf=consider_leaf,
+            _depth_limit=depth_limit,
+            _sort_neighbors=sort_neighbors,
+        ),
+        depths,
+    )
 
 
 def netlist_dfs_edges(
@@ -1162,7 +1180,11 @@ def netlist_dfs_edges(
             while stack:
                 _parent, depth_now, children = stack[-1]
                 d = maxDepth - depth_now
-                forcedLeaf = _consider_leaf(_parent, _G.nodes[_parent]) if _consider_leaf is not None else False
+                forcedLeaf = (
+                    _consider_leaf(_parent, _G.nodes[_parent])
+                    if _consider_leaf is not None
+                    else False
+                )
                 try:
                     child = next(children)
                     if _skip is not None and _skip(child, _G.nodes[child]):
@@ -1178,14 +1200,17 @@ def netlist_dfs_edges(
                 except StopIteration:
                     stack.pop()
 
-    return _netlist_generic_dfs_edges(
-        _G=G,
-        _source=source,
-        _skip=skip,
-        _consider_leaf=consider_leaf,
-        _depth_limit=depth_limit,
-        _sort_neighbors=sort_neighbors,
-    ), depths
+    return (
+        _netlist_generic_dfs_edges(
+            _G=G,
+            _source=source,
+            _skip=skip,
+            _consider_leaf=consider_leaf,
+            _depth_limit=depth_limit,
+            _sort_neighbors=sort_neighbors,
+        ),
+        depths,
+    )
 
 
 def netlist_bfs_tree(
@@ -1210,7 +1235,7 @@ def netlist_bfs_tree(
     )
     T.add_edges_from(edges_gen)
     for n, d in depths.items():
-        T.nodes[n]['depth'] = d
+        T.nodes[n]["depth"] = d
     return T
 
 
@@ -1238,7 +1263,7 @@ def netlist_dfs_tree(
     )
     T.add_edges_from(edges_gen)
     for n, d in depths.items():
-        T.nodes[n]['depth'] = d
+        T.nodes[n]["depth"] = d
     return T
 
 
@@ -1261,11 +1286,7 @@ def getDAGTreesDFS(
     consider_leaf=None,
 ):
     for source in sources:
-        yield source, netlist_dfs_tree(
-            G,
-            source=source,
-            consider_leaf=consider_leaf
-        )
+        yield source, netlist_dfs_tree(G, source=source, consider_leaf=consider_leaf)
 
 
 def __depths(G, root, weight, consider_leaf):
@@ -1274,12 +1295,13 @@ def __depths(G, root, weight, consider_leaf):
     subgraph = nx.subgraph_view(
         G,
         filter_node=lambda n: n in tree.nodes,
-        filter_edge=lambda u, v: (u == root or not G.nodes[u]['nodeType'].isFF) and v != root,
+        filter_edge=lambda u, v: (u == root or not G.nodes[u]["nodeType"].isFF)
+        and v != root,
     )
-    assert nx.is_directed_acyclic_graph(subgraph), f'tree from {root} is cyclic'
+    assert nx.is_directed_acyclic_graph(subgraph), f"tree from {root} is cyclic"
     for u in nx.topological_sort(subgraph):
         for v in subgraph.neighbors(u):
-            if G.nodes[v]['nodeType'].isFF:
+            if G.nodes[v]["nodeType"].isFF:
                 continue
             w = depths[u] + weight(u, v, subgraph.edges[(u, v)])
             depths[v] = max(depths[v], w)
@@ -1287,7 +1309,7 @@ def __depths(G, root, weight, consider_leaf):
 
 
 def _def_consider_leaf(n, attr):
-    return 'nodeType' in attr and attr['nodeType'].isFF
+    return "nodeType" in attr and attr["nodeType"].isFF
 
 
 def _calcLogicDepths(
@@ -1296,27 +1318,31 @@ def _calcLogicDepths(
     depths=None,
     consider_leaf=_def_consider_leaf,
     verbose=False,
-    weight='weight',
-    ffDepthMode='zero',  # {zero, relative}
+    weight="weight",
+    ffDepthMode="zero",  # {zero, relative}
 ):
     depths = {n: 0 for n in G.nodes()} if depths is None else depths
     weight = _weight_function(G, weight)
-    progress = tqdm.tqdm(desc='sources', total=len(sources)) if verbose else None
+    progress = tqdm.tqdm(desc="sources", total=len(sources)) if verbose else None
 
-    if ffDepthMode == 'relative':
+    if ffDepthMode == "relative":
         raise NotImplementedError
-    elif ffDepthMode == 'zero':
+    elif ffDepthMode == "zero":
         sourceIter = iter(sources)
         with ProcessPoolExecutor() as pool:
-            futures = {pool.submit(
-                __depths,
-                G=G, root=source, weight=weight, consider_leaf=consider_leaf)
+            futures = {
+                pool.submit(
+                    __depths,
+                    G=G,
+                    root=source,
+                    weight=weight,
+                    consider_leaf=consider_leaf,
+                )
                 for source in itertools.islice(sourceIter, 200)
             }
             while futures:
                 done, futures = concurrent.futures.wait(
-                    futures,
-                    return_when=concurrent.futures.FIRST_COMPLETED
+                    futures, return_when=concurrent.futures.FIRST_COMPLETED
                 )
                 for fut in done:
                     for n, d in fut.result().items():
@@ -1324,12 +1350,19 @@ def _calcLogicDepths(
                     if progress is not None:
                         progress.update()
                 for source in itertools.islice(sourceIter, len(done)):
-                    futures.add(pool.submit(
-                        __depths,
-                        G=G, root=source, weight=weight, consider_leaf=consider_leaf
-                    ))
+                    futures.add(
+                        pool.submit(
+                            __depths,
+                            G=G,
+                            root=source,
+                            weight=weight,
+                            consider_leaf=consider_leaf,
+                        )
+                    )
     else:
-        raise Exception(f'Invalid depth mode: {ffDepthMode} not one of [zero, relative]')
+        raise Exception(
+            f"Invalid depth mode: {ffDepthMode} not one of [zero, relative]"
+        )
 
     return depths
 
@@ -1337,7 +1370,7 @@ def _calcLogicDepths(
 def calcLogicDepth(
     G: Union[nx.Graph, Graph],
     timeit=False,
-    ffDepthMode='zero',
+    ffDepthMode="zero",
 ):
     """
     The combinational logic depth is defined as the maximum number of combinational logic levels,
@@ -1354,30 +1387,25 @@ def calcLogicDepth(
 
     if timeit:
         import time
+
         tic = time.time()
     if isinstance(G, (nx.Graph, Graph)):
         nxGraph: nx.DiGraph = G if isinstance(G, nx.Graph) else G.toNetworkX()
         depths = {n: 0 for n in nxGraph.nodes()}
         sources = [
-            v for v, a in nxGraph.nodes.items() if
-            a['nodeType'] == NodeType.input
+            v for v, a in nxGraph.nodes.items() if a["nodeType"] == NodeType.input
         ]
-        sources += [
-            v for v in nxGraph.nodes()
-            if nxGraph.nodes[v]['nodeType'].isFF
-        ]
+        sources += [v for v in nxGraph.nodes() if nxGraph.nodes[v]["nodeType"].isFF]
         _calcLogicDepths(
-            nxGraph,
-            sources,
-            depths=depths,
-            ffDepthMode=ffDepthMode,
-            verbose=timeit
+            nxGraph, sources, depths=depths, ffDepthMode=ffDepthMode, verbose=timeit
         )
     else:
-        raise Exception(f'Unsupported graph type: {G.__class__}, expects {nx.Graph.__class__} or {Graph.__class__}')
+        raise Exception(
+            f"Unsupported graph type: {G.__class__}, expects {nx.Graph.__class__} or {Graph.__class__}"
+        )
 
     if timeit:
-        print(f'Logic Depth Calc: {time.time() - tic:.5} secs')
+        print(f"Logic Depth Calc: {time.time() - tic:.5} secs")
 
     # pprint.pprint(depths)
 
@@ -1397,24 +1425,30 @@ class Graph(object):
 
     def equality(self, other: Graph):
         if self.numNodes != other.numNodes:
-            return False, ('Number of nodes', [(self.numNodes, other.numNodes)])
+            return False, ("Number of nodes", [(self.numNodes, other.numNodes)])
 
         if self.numEdges != other.numEdges:
-            return False, ('Number of edges', [(self.numEdges, other.numEdges)])
+            return False, ("Number of edges", [(self.numEdges, other.numEdges)])
 
         if self.type != other.type:
-            return False, ('Graph types', [(self.type, other.type)])
+            return False, ("Graph types", [(self.type, other.type)])
 
         if self.features != other.features:
-            return False, ('Graph features', [(self.features, other.features)])
+            return False, ("Graph features", [(self.features, other.features)])
 
-        unequalEdges = [(se, sea, other.edges[se]) for se, sea in self.edges.items() if sea != other.edges[se]]
+        unequalEdges = [
+            (se, sea, other.edges[se])
+            for se, sea in self.edges.items()
+            if sea != other.edges[se]
+        ]
         if len(unequalEdges) > 0:
-            return False, ('Edges', unequalEdges)
+            return False, ("Edges", unequalEdges)
 
-        unequalNodes = [(n, v, other.nodes[n]) for n, v in self.nodes.items() if v != other.nodes[n]]
+        unequalNodes = [
+            (n, v, other.nodes[n]) for n, v in self.nodes.items() if v != other.nodes[n]
+        ]
         if len(unequalNodes) > 0:
-            return False, ('Nodes', unequalNodes)
+            return False, ("Nodes", unequalNodes)
         return True, None
 
     @property
@@ -1427,15 +1461,27 @@ class Graph(object):
 
     @property
     def inputNodeIds(self) -> List[NodeID]:
-        return [nId for nId, attributes in self.nodes.items() if attributes.nodeType == NodeType.input]
+        return [
+            nId
+            for nId, attributes in self.nodes.items()
+            if attributes.nodeType == NodeType.input
+        ]
 
     @property
     def primaryInNets(self) -> List:
-        return [list(attrs.ports.keys())[0] for _, attrs in self.nodes.items() if attrs.nodeType == NodeType.input]
+        return [
+            list(attrs.ports.keys())[0]
+            for _, attrs in self.nodes.items()
+            if attrs.nodeType == NodeType.input
+        ]
 
     @property
     def primaryOutNets(self):
-        return [list(attrs.ports.keys())[0] for _, attrs in self.nodes.items() if attrs.nodeType == NodeType.output]
+        return [
+            list(attrs.ports.keys())[0]
+            for _, attrs in self.nodes.items()
+            if attrs.nodeType == NodeType.output
+        ]
 
     def iterInputNodeIds(self):
         for nId, attributes in self.nodes.items():
@@ -1448,7 +1494,7 @@ class Graph(object):
         graphType: GraphType = GraphType.directed,
         nodes: OrderedDict[NodeID, NodeAttributes] = None,
         edges: List[Tuple[NodePort, NodePort, EdgeAttributes]] = None,
-        sourceFile=None
+        sourceFile=None,
     ):
         """
         Graph initializer
@@ -1471,14 +1517,20 @@ class Graph(object):
         `nodes` is a dictionary of nodes.
         Each key is a node ID, and each value is a dictionary of attributes for that node
         """
-        self.nodes: OrderedDict[NodeID, NodeAttributes] = OrderedDict() if nodes is None else nodes
+        self.nodes: OrderedDict[NodeID, NodeAttributes] = (
+            OrderedDict() if nodes is None else nodes
+        )
 
         """
         `edges` is a list of tuples.  each tuple represents an edge of the form `(source_id, target_id, edge_attributes)`
         See EdgeDirection for valid direction values 
         """
-        self.edges: OrderedDict[Tuple[NodePort, NodePort], EdgeAttributes] = OrderedDict() if edges is None else edges
-        self.edgeLookup: OrderedDict[str, Set[Tuple[NodePort, NodePort]]] = OrderedDict()
+        self.edges: OrderedDict[Tuple[NodePort, NodePort], EdgeAttributes] = (
+            OrderedDict() if edges is None else edges
+        )
+        self.edgeLookup: OrderedDict[
+            str, Set[Tuple[NodePort, NodePort]]
+        ] = OrderedDict()
 
         self.libraryModules: Set[str] = set()
 
@@ -1488,23 +1540,22 @@ class Graph(object):
         raise NotImplementedError
 
     @staticmethod
-    def fromBenchmark(
-        benchmark,
-        **kwargs
-    ) -> Graph:
+    def fromBenchmark(benchmark, **kwargs) -> Graph:
         if benchmark.rootDir is None:
-            raise Exception(f'Benchmark must have rootPath set: {benchmark}')
+            raise Exception(f"Benchmark must have rootPath set: {benchmark}")
 
         return Graph.fromVerilog(
             filePath=benchmark.vPath,
             scoapPath=benchmark.scoapPath,
             switchingPath=benchmark.switchPath,
             faultPath=benchmark.faultPath,
-            **kwargs
+            **kwargs,
         )
 
     @staticmethod
-    def verilogToJSON(rootDir: Path, libraryPath: Path = None, unpicklable=True, overwrite=False):
+    def verilogToJSON(
+        rootDir: Path, libraryPath: Path = None, unpicklable=True, overwrite=False
+    ):
         """
         Convenience function to convert a directory of verilog netlists to JSON graph files
         :param rootDir: Root path for design files
@@ -1513,45 +1564,66 @@ class Graph(object):
         :param overwrite: flag to overwrite any existing JSON files with derived JSON path
         :return: Paths to the output JSON files
         """
-        rootDir = rootDir.expanduser()  # Path("~/Dropbox (UFL)/STAMP/data/trojan-hypergraph").expanduser()
-        libraryPath = libraryPath.expanduser()  # Path('~/Dropbox (UFL)/STAMP/data/library/lec25dscc25.v').expanduser()
-        _iter = tqdm.tqdm(list(rootDir.rglob('*.v')))
+        rootDir = (
+            rootDir.expanduser()
+        )  # Path("~/Dropbox (UFL)/STAMP/data/trojan-hypergraph").expanduser()
+        libraryPath = (
+            libraryPath.expanduser()
+        )  # Path('~/Dropbox (UFL)/STAMP/data/library/lec25dscc25.v').expanduser()
+        _iter = tqdm.tqdm(list(rootDir.rglob("*.v")))
         outPaths = []
         for verilogPath in _iter:
-            _iter.set_description(f'{verilogPath.name}')
-            outPath = verilogPath.parent.joinpath(f'{verilogPath.stem}{"-unpicklable" if unpicklable else ""}.json')
+            _iter.set_description(f"{verilogPath.name}")
+            outPath = verilogPath.parent.joinpath(
+                f'{verilogPath.stem}{"-unpicklable" if unpicklable else ""}.json'
+            )
             outPaths.append(outPath)
-            if 'lec' in verilogPath.name:
+            if "lec" in verilogPath.name:
                 continue
             try:
-                G = Graph.fromVerilog(verilogPath, libraryPath=libraryPath, verbose=False)
+                G = Graph.fromVerilog(
+                    verilogPath, libraryPath=libraryPath, verbose=False
+                )
                 G.to_json(outPath, unpicklable=unpicklable, overwrite=overwrite)
             except Exception as e:
                 print(e, verilogPath)
         return outPaths
 
     @staticmethod
-    def fromReader(graphReader: RegExpReader, sourceFileName, libraryPath=None, printSummaryTable=False):
+    def fromReader(
+        graphReader: RegExpReader,
+        sourceFileName,
+        libraryPath=None,
+        printSummaryTable=False,
+    ):
         graph = Graph(name=graphReader.moduleName, sourceFile=sourceFileName)
 
         if libraryPath is not None:
             libText = libraryPath.read_text()
-            graph.moduleNames = set(re.findall(r'module (\w+)', libText))
+            graph.moduleNames = set(re.findall(r"module (\w+)", libText))
 
         summaryString = []
 
         for k, net in graphReader.nets.items():
             if printSummaryTable:
-                summaryString.append([f'{k}',
-                                      f'{net.netType}',
-                                      f'{_stringsFromNodeList(net.leavingFrom, graphReader)}',
-                                      f'{_stringsFromNodeList(net.goingTo, graphReader)}',
-                                      f'{net.aliases if len(net.aliases) > 0 else "-"}'])
+                summaryString.append(
+                    [
+                        f"{k}",
+                        f"{net.netType}",
+                        f"{_stringsFromNodeList(net.leavingFrom, graphReader)}",
+                        f"{_stringsFromNodeList(net.goingTo, graphReader)}",
+                        f'{net.aliases if len(net.aliases) > 0 else "-"}',
+                    ]
+                )
             for source in net.leavingFrom:
                 graph.addNode(graphReader.nodes[source.nodeId])
                 for target in net.goingTo:
                     graph.addNode(graphReader.nodes[target.nodeId])
-                    graph.addEdge(source, target, EdgeAttributes(nets={(net.identifier, net.netType)}))
+                    graph.addEdge(
+                        source,
+                        target,
+                        EdgeAttributes(nets={(net.identifier, net.netType)}),
+                    )
 
         return graph, summaryString
 
@@ -1565,7 +1637,7 @@ class Graph(object):
         verbose=False,
         printSummaryTable=False,
         primaryIOmode: PIMode = PIMode.netMatch,
-        ffDepthMode='zero',
+        ffDepthMode="zero",
     ) -> Graph:
         """
         This function primarily takes in a verilog file and returns a Graph
@@ -1590,41 +1662,44 @@ class Graph(object):
         graphReader.parseGateNetlistFile(filePath, libraryPath=libraryPath)
 
         if logger is not None:
-            logger.info('Reading graph...')
+            logger.info("Reading graph...")
 
         graph, summaryString = Graph.fromReader(
             graphReader,
             sourceFileName=filePath.name,
             libraryPath=libraryPath,
-            printSummaryTable=printSummaryTable
+            printSummaryTable=printSummaryTable,
         )
 
         if printSummaryTable:
-            max_cols = pd.get_option('display.max_columns')
-            pd.set_option('display.max_columns', None)
-            tv = pd.DataFrame(summaryString, columns=['net', 'type', 'source_node', 'target_nodes', 'aliases'])
-            tv.set_index('net', inplace=True)
+            max_cols = pd.get_option("display.max_columns")
+            pd.set_option("display.max_columns", None)
+            tv = pd.DataFrame(
+                summaryString,
+                columns=["net", "type", "source_node", "target_nodes", "aliases"],
+            )
+            tv.set_index("net", inplace=True)
             print(tv)
-            pd.set_option('display.max_columns', max_cols)
+            pd.set_option("display.max_columns", max_cols)
 
         if scoapPath is not None and scoapPath.exists():
             graph.addScoapData(scoapPath, primaryIOmode, verbose)
         elif verbose:
-            print(f'WARNING: No SCOAP data provided for {filePath.name}')
+            print(f"WARNING: No SCOAP data provided for {filePath.name}")
 
         if switchingPath is not None and switchingPath.exists():
             graph.addSwitchingData(switchingPath, verbose)
         elif verbose:
-            print(f'WARNING: No SWITCHING data provided for {filePath.name}')
+            print(f"WARNING: No SWITCHING data provided for {filePath.name}")
 
         if faultPath is not None and faultPath.exists():
             graph.addFaultData(faultPath, primaryIOmode, verbose)
         elif verbose:
-            print(f'WARNING: No FAULT data provided for {filePath.name}')
+            print(f"WARNING: No FAULT data provided for {filePath.name}")
 
         depths = calcLogicDepth(graph, timeit=verbose, ffDepthMode=ffDepthMode)
         for n, d in depths.items():
-            graph.nodes[n]['logicDepth'] = d
+            graph.nodes[n]["logicDepth"] = d
 
         return graph
 
@@ -1634,7 +1709,9 @@ class Graph(object):
     def addScoapData(self, path: Path, piMode: PIMode, verbose=False):
         scoapData = DataHelpers.readSCOAP(path)
         if verbose:
-            entries = tqdm.tqdm(scoapData.instances.items(), desc="Adding SCOAP to graph")
+            entries = tqdm.tqdm(
+                scoapData.instances.items(), desc="Adding SCOAP to graph"
+            )
         else:
             entries = scoapData.instances.items()
         printer = entries.write if verbose else print
@@ -1642,7 +1719,9 @@ class Graph(object):
             for entry in moduleEntries:
                 for inst in entry.instances:
                     if inst.isOutput and inst.identifier is not None:
-                        nId = nodeIdForPrimaryIO(entry.instanceType, entry.identifier, piMode)
+                        nId = nodeIdForPrimaryIO(
+                            entry.instanceType, entry.identifier, piMode
+                        )
                         # for edge in self.edges:
                         #     if edge[0] == NodePort(nName, pId):
                         #         # atpg values for output net apply to node attributes
@@ -1654,25 +1733,29 @@ class Graph(object):
                         #                           f'{self.nodes[nName]}, {inst.atpg.combinational}'
                         #                     raise Exception(msg)
                         try:
-                            self.nodes[nId].update(dict(
-                                control0=inst.atpg.combinational[0],
-                                control1=inst.atpg.combinational[1],
-                                observe=inst.atpg.combinational[2],
-                                seqControl0=inst.atpg.sequential[0],
-                                seqControl1=inst.atpg.sequential[1],
-                                propValObserve=inst.atpg.sequential[2],
-                                sensGatObserve=inst.atpg.sequential[3],
-                            ))
+                            self.nodes[nId].update(
+                                dict(
+                                    control0=inst.atpg.combinational[0],
+                                    control1=inst.atpg.combinational[1],
+                                    observe=inst.atpg.combinational[2],
+                                    seqControl0=inst.atpg.sequential[0],
+                                    seqControl1=inst.atpg.sequential[1],
+                                    propValObserve=inst.atpg.sequential[2],
+                                    sensGatObserve=inst.atpg.sequential[3],
+                                )
+                            )
                         except KeyError:
                             if verbose:
-                                printer(f'WARNING: No Node for SCOAP Entry {entry.identifier}')
+                                printer(
+                                    f"WARNING: No Node for SCOAP Entry {entry.identifier}"
+                                )
                         break
 
         # Handle any cases where scoap values weren't added to nodes
         # ensures that feature vectors are the same length
         for node, attrs in self.nodes.items():
-            if 'control0' not in attrs.keys():
-                raise Exception(f'SCOAP data not found for node: {node}')
+            if "control0" not in attrs.keys():
+                raise Exception(f"SCOAP data not found for node: {node}")
                 # self.nodes[node].update(dict(
                 #     control0=np.iinfo(np.int32).min,
                 #     control1=np.iinfo(np.int32).min,
@@ -1681,7 +1764,7 @@ class Graph(object):
 
     def addSwitchingData(self, path: Path, verbose=False):
         probs = DataHelpers.readSwitchingProbabilities(path)
-        probs.set_index('net', inplace=True)
+        probs.set_index("net", inplace=True)
 
         if verbose:
             edges = tqdm.tqdm(self.edges.items(), desc="Switching probs")
@@ -1707,13 +1790,15 @@ class Graph(object):
                     # Switching probability (1->0) = toggleRate * (1 - staticProb)
                     # Switching probability (0->0) = (1 - toggleRate) * (1 - staticProb)
                     # Switching probability (1->1) = (1 - toggleRate) * staticProb
-                    switchingProb0_1=probs.loc[netId].toggleRate * probs.loc[netId].staticProb,
-                    switchingProb1_0=probs.loc[netId].toggleRate * (1.0 - probs.loc[netId].staticProb),
+                    switchingProb0_1=probs.loc[netId].toggleRate
+                    * probs.loc[netId].staticProb,
+                    switchingProb1_0=probs.loc[netId].toggleRate
+                    * (1.0 - probs.loc[netId].staticProb),
                     staticProb=probs.loc[netId].staticProb,
                     toggleRate=probs.loc[netId].toggleRate,
                     totalNetLoad=probs.loc[netId].totalNetLoad,
                     switchPower=probs.loc[netId].switchingPower,
-                    switchingAttr=probs.loc[netId].attrs
+                    switchingAttr=probs.loc[netId].attrs,
                 )
                 attrs.update(vals)
             except KeyError:
@@ -1723,24 +1808,27 @@ class Graph(object):
             for edge in self.edgeLookup[net]:
                 attrs = self.edges[edge]
                 if set(valKeys) not in set(attrs.keys()):
-                    aliases = attrs['aliases']
+                    aliases = attrs["aliases"]
                     for alias in aliases:
                         didSet = False
                         for e in self.edgeLookup[alias]:
                             try:
-                                self.edges[edge].update({k: self.edges[e][k] for k in valKeys})
+                                self.edges[edge].update(
+                                    {k: self.edges[e][k] for k in valKeys}
+                                )
                                 didSet = True
                             except:
                                 pass
-                            if didSet:  # only needs to find the first probs that were set
+                            if (
+                                didSet
+                            ):  # only needs to find the first probs that were set
                                 break  # breaks edgelookup
                         if didSet:
                             break  # breaks alias loop
 
     def addFaultData(self, path: Path, piMode, verbose=False):
-
         faultTable = DataHelpers.readFaultReport(path)
-        faultCounts = faultTable.groupby(['pin', 'stuckAt']).faultType.value_counts()
+        faultCounts = faultTable.groupby(["pin", "stuckAt"]).faultType.value_counts()
         inNets = self.primaryInNets
         outNets = self.primaryOutNets
         counts = faultCounts.items()
@@ -1748,14 +1836,14 @@ class Graph(object):
             counts = tqdm.tqdm(counts, total=faultCounts.shape[0], desc="Adding Faults")
 
         for (pin, sa, at), c in counts:
-            pin = pin.strip(' ')
+            pin = pin.strip(" ")
             if pin in inNets:
-                nodeId, nodePin = nodeIdForPrimaryIO('pi', pin, piMode), pin
+                nodeId, nodePin = nodeIdForPrimaryIO("pi", pin, piMode), pin
             elif pin in outNets:
-                nodeId, nodePin = nodeIdForPrimaryIO('po', pin, piMode), pin
+                nodeId, nodePin = nodeIdForPrimaryIO("po", pin, piMode), pin
             else:
                 try:
-                    nodeId, nodePin = pin.split('/')
+                    nodeId, nodePin = pin.split("/")
                 except:
                     nodeId, nodePin = pin, pin
 
@@ -1774,7 +1862,9 @@ class Graph(object):
     def _addNode(self, nodeId: NodeID, attributes: NodeAttributes = None):
         self.nodes[nodeId] = NodeAttributes() if attributes is None else attributes
 
-    def addNode(self, node: Union[NodeEntry, NodePort], attributes: NodeAttributes = None):
+    def addNode(
+        self, node: Union[NodeEntry, NodePort], attributes: NodeAttributes = None
+    ):
         """
         Add a node with optional attributes to the graph
 
@@ -1793,12 +1883,8 @@ class Graph(object):
                 self._addNode(node.nodeId, attributes)
 
     def addEdge(
-        self,
-        source: NodePort,
-        target: NodePort,
-        attributes: EdgeAttributes = None
+        self, source: NodePort, target: NodePort, attributes: EdgeAttributes = None
     ):
-
         if source.nodeId not in self.nodes.keys():
             self.addNode(source)
         if target.nodeId not in self.nodes.keys():
@@ -1807,7 +1893,9 @@ class Graph(object):
         if attributes is not None:
             attributes.update(sourcePort=source.port, targetPort=target.port)
         else:
-            attributes = EdgeAttributes(nets=set(), sourcePort=source.port, targetPort=target.port)
+            attributes = EdgeAttributes(
+                nets=set(), sourcePort=source.port, targetPort=target.port
+            )
 
         edge = (source, target)
         if edge in self.edges:
@@ -1828,7 +1916,6 @@ class Graph(object):
         import jsonpickle
 
         class EnumEncoder(jsonpickle.handlers.BaseHandler):
-
             def restore(self, obj):
                 pass
 
@@ -1853,33 +1940,35 @@ class Graph(object):
         nodeFeatures: list,
         edgeFeatures: list = None,
         categoryFeatures: list = None,
-        categoryEncoder: str='binary'
+        categoryEncoder: str = "binary",
     ) -> Data:
         nxGraph = self.toNetworkX()
         categoryFeatures = [] if categoryFeatures is None else categoryFeatures
         for i, (node, feat_dict) in enumerate(nxGraph.nodes(data=True)):
             tuples = [(key, value) for key, value in feat_dict.items()]
             for key, value in tuples:
-                if hasattr(value, 'toTorch'):
+                if hasattr(value, "toTorch"):
                     nxGraph.nodes[node][key] = value.toTorch(
-                        categoryEncoding=categoryEncoder if key in categoryFeatures else None
+                        categoryEncoding=categoryEncoder
+                        if key in categoryFeatures
+                        else None
                     )
                 elif type(value) not in [int, str, float]:
                     nxGraph.nodes[node].pop(key)
         for i, (e1, e2, feat_dict) in enumerate(nxGraph.edges(data=True)):
             tuples = [(key, value) for key, value in feat_dict.items()]
             for key, value in tuples:
-                if hasattr(value, 'toTorch'):
+                if hasattr(value, "toTorch"):
                     nxGraph.edges[(e1, e2)][key] = value.toTorch(
-                        categoryEncoding=categoryEncoder if key in categoryFeatures else None
+                        categoryEncoding=categoryEncoder
+                        if key in categoryFeatures
+                        else None
                     )
                 elif type(value) not in [int, str, float]:
                     nxGraph.edges[(e1, e2)].pop(key)
 
         data = pygeo_utils.from_networkx(
-            nxGraph,
-            group_node_attrs=nodeFeatures,
-            group_edge_attrs=edgeFeatures
+            nxGraph, group_node_attrs=nodeFeatures, group_edge_attrs=edgeFeatures
         )
         if data.x is not None:
             data.x = data.x.float()
@@ -1890,7 +1979,6 @@ class Graph(object):
         return data
 
     def toNetworkX(self) -> nx.DiGraph:
-
         if self.type in [GraphType.directed, GraphType.directedAcyclic]:
             G = nx.DiGraph(directed=True)
         else:
@@ -2044,19 +2132,21 @@ class Graph(object):
             layout = {n: pos[n] for n in G_.nodes()}
             for edge in G_.edges:
                 ax.annotate(
-                    '',
-                    xy=layout[edge[1]], xycoords='data',
-                    xytext=layout[edge[0]], textcoords='data',
+                    "",
+                    xy=layout[edge[1]],
+                    xycoords="data",
+                    xytext=layout[edge[0]],
+                    textcoords="data",
                     arrowprops=dict(
-                        arrowstyle='-|>' if isinstance(G_, nx.DiGraph) else "-",
-                        color='0',
+                        arrowstyle="-|>" if isinstance(G_, nx.DiGraph) else "-",
+                        color="0",
                         alpha=0.4,
                         shrinkA=5,
                         shrinkB=5,
                         patchA=None,
                         patchB=None,
-                        connectionstyle='arc3,rad=-0.2'
-                    )
+                        connectionstyle="arc3,rad=-0.2",
+                    ),
                 )
             # _ = nx.draw_networkx_edges(
             #     G,
@@ -2070,33 +2160,37 @@ class Graph(object):
             _ = nx.draw_networkx_edges(
                 G_,
                 pos,
-                arrowstyle='-|>' if isinstance(G_, nx.DiGraph) else '-',
+                arrowstyle="-|>" if isinstance(G_, nx.DiGraph) else "-",
                 alpha=0.9,
-                edge_color='0.2',
-                width=0.5
+                edge_color="0.2",
+                width=0.5,
             )
 
         if edgeLabels is not None:
-            nx.draw_networkx_edge_labels(G_, pos, edge_labels=edgeLabels, label_pos=0.75)
+            nx.draw_networkx_edge_labels(
+                G_, pos, edge_labels=edgeLabels, label_pos=0.75
+            )
 
         nNodeLabels = len(nodeLabels)
-        cmap = 'Set1' if nNodeLabels <= 9 else 'jet'
+        cmap = "Set1" if nNodeLabels <= 9 else "jet"
         pathCollection = nx.draw_networkx_nodes(
-            G_, pos,
+            G_,
+            pos,
             nodelist=nodes,
             node_color=colors,
             node_size=nodeSize,
             alpha=nodeAlpha,
-            cmap=plt.cm.get_cmap(cmap, nNodeLabels)
+            cmap=plt.cm.get_cmap(cmap, nNodeLabels),
         )
 
         nodes = nx.draw_networkx_nodes(
-            G, pos,
+            G,
+            pos,
             nodelist=nodes,
             node_color=colors,
             node_size=nodeSize,
             alpha=nodeAlpha,
-            cmap=plt.cm.get_cmap('jet', len(nodeLabels))
+            cmap=plt.cm.get_cmap("jet", len(nodeLabels)),
         )
 
         if nodeLabelNudge is not None:
@@ -2106,11 +2200,17 @@ class Graph(object):
 
         if nodeLabelKey is not None:
             try:
-                nx.draw_networkx_labels(G_, nodeLabelPos, labels={n: G_.nodes[n][nodeLabelKey] for n in G_.nodes})
+                nx.draw_networkx_labels(
+                    G_,
+                    nodeLabelPos,
+                    labels={n: G_.nodes[n][nodeLabelKey] for n in G_.nodes},
+                )
             except KeyError:
-                print(f'Nodes do not have label key: {nodeLabelKey}')
+                print(f"Nodes do not have label key: {nodeLabelKey}")
         elif nodeLabelIndexes:
-            nx.draw_networkx_labels(G_, nodeLabelPos, labels={n: i for i, n in enumerate(G_.nodes)})
+            nx.draw_networkx_labels(
+                G_, nodeLabelPos, labels={n: i for i, n in enumerate(G_.nodes)}
+            )
         else:
             nx.draw_networkx_labels(G_, nodeLabelPos, labels={})
 
@@ -2120,9 +2220,9 @@ class Graph(object):
                 pathCollection,
                 ticks=np.arange(0, len(types)),
                 format=formatter,
-                location='bottom',
+                location="bottom",
                 fraction=0.03,
-                pad=0
+                pad=0,
             )
 
         if title is not None:
@@ -2145,7 +2245,7 @@ class Graph(object):
         curvedPaths=False,
         figsize=(20, 10),
         nodeLabelNudge=(0, 0.03),
-        consider_leaf=_def_consider_leaf
+        consider_leaf=_def_consider_leaf,
     ):
         if saveDir is not None:
             saveDir.mkdir(parents=True, exist_ok=True)
@@ -2155,11 +2255,9 @@ class Graph(object):
         if not isinstance(roots, list):
             roots = [roots]
 
-        for root, tree in tqdm.tqdm(getDAGTreesBFS(
-                G,
-                roots,
-                consider_leaf=consider_leaf
-        )):
+        for root, tree in tqdm.tqdm(
+            getDAGTreesBFS(G, roots, consider_leaf=consider_leaf)
+        ):
             subgraph = nx.subgraph_view(
                 G,
                 filter_node=lambda n: n in tree.nodes,
@@ -2169,39 +2267,43 @@ class Graph(object):
             # assert nx.is_directed_acyclic_graph(subgraph), f'Has cycles'
 
             for n in tree.nodes():
-                subgraph.nodes[n]['depth'] = tree.nodes[n]['depth']
-                tree.nodes[n]['identifier'] = G.nodes[n]['identifier']
+                subgraph.nodes[n]["depth"] = tree.nodes[n]["depth"]
+                tree.nodes[n]["identifier"] = G.nodes[n]["identifier"]
                 try:
-                    tree.nodes[n]['nodeType'] = G.nodes[n]['nodeType']
+                    tree.nodes[n]["nodeType"] = G.nodes[n]["nodeType"]
                 except:
                     pass
 
             if len(tree) <= 1:
-                print(f'{root}: {tree}')
+                print(f"{root}: {tree}")
             else:
                 Graph.drawGraph(
                     subgraph,
-                    title=f'{root} Subgraph',
+                    title=f"{root} Subgraph",
                     layout=GraphLayout.nx.multipartite,
-                    nodeColorKey='nodeType',
-                    nodeLabelKey='identifier',
-                    layoutArgs=dict(subset_key='logicDepth'),
+                    nodeColorKey="nodeType",
+                    nodeLabelKey="identifier",
+                    layoutArgs=dict(subset_key="logicDepth"),
                     curvedPaths=curvedPaths,
                     nodeLabelNudge=nodeLabelNudge,
                     figSize=figsize,
-                    savePath=saveDir / f'{self.name}_{root}.pdf' if saveDir is not None else None
+                    savePath=saveDir / f"{self.name}_{root}.pdf"
+                    if saveDir is not None
+                    else None,
                 )
                 Graph.drawGraph(
                     tree,
-                    title=f'{root} BFS Tree',
-                    nodeColorKey='nodeType',
-                    nodeLabelKey='identifier',
+                    title=f"{root} BFS Tree",
+                    nodeColorKey="nodeType",
+                    nodeLabelKey="identifier",
                     nodeLabelIndexes=True,
-                    layoutArgs=dict(subset_key='depth'),
+                    layoutArgs=dict(subset_key="depth"),
                     curvedPaths=curvedPaths,
                     nodeLabelNudge=nodeLabelNudge,
                     figSize=figsize,
-                    savePath=saveDir / f'{self.name}_{root}_tree.pdf' if saveDir is not None else None
+                    savePath=saveDir / f"{self.name}_{root}_tree.pdf"
+                    if saveDir is not None
+                    else None,
                 )
 
     def draw(
@@ -2209,13 +2311,13 @@ class Graph(object):
         layout: GraphLayout.nx = GraphLayout.nx.multipartite,
         edgeLabelKey=None,  # 'netId',
         nodeLabelKey=None,  # 'identifier',
-        nodeColorKey='nodeType',
+        nodeColorKey="nodeType",
         curvedPaths=False,
         layoutArgs=None,
-        layerKey='logicDepth',
+        layerKey="logicDepth",
         savePath=None,
         ffSubtreeSources=None,
-        **kwargs
+        **kwargs,
     ):
         """
 
@@ -2236,28 +2338,34 @@ class Graph(object):
 
         """
         # TODO: use relative scan/ff
-        layoutArgs = dict(
-            subset_key=layerKey
-        ) if layoutArgs is None and layout == GraphLayout.nx.multipartite else layoutArgs
+        layoutArgs = (
+            dict(subset_key=layerKey)
+            if layoutArgs is None and layout == GraphLayout.nx.multipartite
+            else layoutArgs
+        )
 
         if ffSubtreeSources is not None:
-            node, tree = next(getDAGTreesDFS(
-                self.toNetworkX(),
-                ffSubtreeSources if isinstance(ffSubtreeSources, list) else [ffSubtreeSources],
-                consider_leaf=lambda n, a: a['nodeType'].isFF,
-            ))
+            node, tree = next(
+                getDAGTreesDFS(
+                    self.toNetworkX(),
+                    ffSubtreeSources
+                    if isinstance(ffSubtreeSources, list)
+                    else [ffSubtreeSources],
+                    consider_leaf=lambda n, a: a["nodeType"].isFF,
+                )
+            )
 
             Graph.drawGraph(
                 tree,
                 title=node,
-                nodeColorKey='nodeType',
-                nodeLabelKey='identifier',
-                layoutArgs=dict(subset_key='depth'),
+                nodeColorKey="nodeType",
+                nodeLabelKey="identifier",
+                layoutArgs=dict(subset_key="depth"),
                 curvedPaths=False,
                 nodeLabelNudge=(0, 0.01),
                 figSize=(30, 10),
                 savePath=savePath,
-                **kwargs
+                **kwargs,
             )
         else:
             Graph.drawGraph(
@@ -2269,5 +2377,5 @@ class Graph(object):
                 layoutArgs=layoutArgs,
                 curvedPaths=curvedPaths,
                 savePath=savePath,
-                **kwargs
+                **kwargs,
             )

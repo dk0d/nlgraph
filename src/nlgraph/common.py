@@ -17,7 +17,7 @@ def makeNumerical(val: str):
         if "." in val:
             return float(val)
         return int(val)
-    except:
+    except Exception:
         return val
 
 
@@ -28,7 +28,7 @@ def getListOfChildren(ctx, classType):
 def getFirstChild(ctx, classType):
     try:
         return getListOfChildren(ctx, classType)[0]
-    except:
+    except Exception:
         return None
 
 
