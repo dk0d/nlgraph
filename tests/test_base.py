@@ -1,5 +1,6 @@
 # %%
 import nlgraph as ng
+import pytest
 from pathlib import Path
 from nlgraph.graph import Graph
 
@@ -11,17 +12,17 @@ else:
 NETLIST_DIR = RESOURCES_DIR / "netlists"
 
 
-def test_parse():
-    for vPath in NETLIST_DIR.glob("*.v"):
-        if "PRESENT" not in vPath.name:
-            continue
-        graph = Graph.fromVerilog(
-            filePath=vPath,
-        )
+@pytest.mark.parametrize(
+    "filePath",
+    [vPath.as_posix() for vPath in NETLIST_DIR.glob("*.v")],
+)
+def test_parse(filePath):
+    graph = Graph.fromVerilog(
+        filePath=Path(filePath),
+    )
+    assert graph is not None, f"Failed to parse {filePath.name}"
 
-        assert graph is not None, f"Failed to parse {vPath.name}"
 
+# test_parse()
 
-test_parse()
-
-print("Done!")
+# print("Done!")

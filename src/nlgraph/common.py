@@ -35,8 +35,8 @@ def getFirstChild(ctx, classType):
 class RegexConstants:
     BIAS_EXP = r"[10]'b[10]"
 
-    # ['D', 'CLK', 'IN', 'INP', 'RSTB', 'S', 'CI'] added 'A' - 'P' for benchmark parsing
-    PIN_INPUT_EXP = r"IN\d*|D\d*|INP\d*|RSTB\d*|S\d*|CLK\d*|[A-P]\d*|CI"
+    # ['D', 'CLK', 'IN', 'INP', 'RSTB', 'S', 'CI', 'SETB'] added 'A' - 'P' for benchmark parsing
+    PIN_INPUT_EXP = r"IN\d*|D\d*|INP\d*|RSTB\d*|S\d*|CLK\d*|[A-P]\d*|CI|SETB"
 
     # ['Q', 'QN', 'Z', 'ZN', 'CO'] added 'Y' for benchmark parsing
     PIN_OUTPUT_EXP = r"Q\d*|QN\d*|Z\d*|ZN\d*|Y\d*|CO"
