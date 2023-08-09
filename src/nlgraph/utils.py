@@ -24,7 +24,6 @@ import tqdm
 from .common import Template, Benchmark
 
 
-
 def multiprocess(
     func,
     argsList,
@@ -54,10 +53,7 @@ def multiprocess(
     else:
         prog = None
     with ProcessPool() as pool:
-        futures = {
-            pool.submit(func, **a)
-            for a in itertools.islice(iterArgs, maxProc)
-        }
+        futures = {pool.submit(func, **a) for a in itertools.islice(iterArgs, maxProc)}
         while futures:
             done, futures = concurrent.futures.wait(
                 futures, return_when=concurrent.futures.FIRST_COMPLETED
@@ -74,10 +70,7 @@ def multiprocess(
 
 
 # Insertion Helpers
-def getFanInMask(
-    graph: nx.DiGraph,
-    nodeIdx: int
-):
+def getFanInMask(graph: nx.DiGraph, nodeIdx: int):
     """
         Returns a mask for the nodes where
         True == non-masked (included) -- i.e. IS a fan-in node
@@ -107,33 +100,32 @@ def getFanInMask(
 
 
 ENCODERS = {
-    'backwardDifference': ce.backward_difference.BackwardDifferenceEncoder,
-    'basen': ce.basen.BaseNEncoder,
-    'binary': ce.binary.BinaryEncoder,
-    'cat_boost': ce.cat_boost.CatBoostEncoder,
-    'hashing': ce.hashing.HashingEncoder,
-    'helmert': ce.helmert.HelmertEncoder,
-    'james_stein': ce.james_stein.JamesSteinEncoder,
-    'one_hot': ce.one_hot.OneHotEncoder,
-    'leave_one_out': ce.leave_one_out.LeaveOneOutEncoder,
-    'm_estimate': ce.m_estimate.MEstimateEncoder,
-    'ordinal': ce.ordinal.OrdinalEncoder,
-    'polynomial': ce.polynomial.PolynomialEncoder,
-    'sum_coding': ce.sum_coding.SumEncoder,
-    'target_encoder': ce.target_encoder.TargetEncoder,
-    'woe': ce.woe.WOEEncoder
+    "backwardDifference": ce.backward_difference.BackwardDifferenceEncoder,
+    "basen": ce.basen.BaseNEncoder,
+    "binary": ce.binary.BinaryEncoder,
+    "cat_boost": ce.cat_boost.CatBoostEncoder,
+    "hashing": ce.hashing.HashingEncoder,
+    "helmert": ce.helmert.HelmertEncoder,
+    "james_stein": ce.james_stein.JamesSteinEncoder,
+    "one_hot": ce.one_hot.OneHotEncoder,
+    "leave_one_out": ce.leave_one_out.LeaveOneOutEncoder,
+    "m_estimate": ce.m_estimate.MEstimateEncoder,
+    "ordinal": ce.ordinal.OrdinalEncoder,
+    "polynomial": ce.polynomial.PolynomialEncoder,
+    "sum_coding": ce.sum_coding.SumEncoder,
+    "target_encoder": ce.target_encoder.TargetEncoder,
+    "woe": ce.woe.WOEEncoder,
 }
 
 
 class NLGraphEnum(Enum):
-
     @classmethod
     def fromString(cls, s: str):
         for nType in cls:
             f = re.search(nType.regex, s, re.IGNORECASE)
             if f is not None:
                 return nType
-        raise Exception(f'String not a valid node type: {s}')
+        raise Exception(f"String not a valid node type: {s}")
 
     def __repr__(self):
         return self.value
@@ -149,7 +141,7 @@ class NLGraphEnum(Enum):
                 if t == i:
                     return nt
         else:
-            raise Exception(f'Invalid node type value: {t}')
+            raise Exception(f"Invalid node type value: {t}")
 
     def __new__(cls, value, regex=None):
         obj = type(value).__new__(cls, [value])
@@ -158,7 +150,9 @@ class NLGraphEnum(Enum):
         obj.regex = regex
         return obj
 
-    def toTorch(self, categoryEncoding=None, members=None, **kwargs) -> Union[int, np.ndarray]:
+    def toTorch(
+        self, categoryEncoding=None, members=None, **kwargs
+    ) -> Union[int, np.ndarray]:
         """
 
         Args:
@@ -172,14 +166,21 @@ class NLGraphEnum(Enum):
             members = self.__class__
 
         try:
-            encoder = ENCODERS[categoryEncoding](cols=['members'])
+            encoder = ENCODERS[categoryEncoding](cols=["members"])
         except:
             encoder = None
 
         if encoder is not None:
-            g = encoder.fit(pd.DataFrame([{'members': m} for m in members]))
-            df = g.transform(pd.DataFrame([{'members': t, 'type': t} for t in members]).set_index('type'))
-            lookup = {k: np.array(list(v.values())) for k, v in df.to_dict(orient='index').items()}
+            g = encoder.fit(pd.DataFrame([{"members": m} for m in members]))
+            df = g.transform(
+                pd.DataFrame([{"members": t, "type": t} for t in members]).set_index(
+                    "type"
+                )
+            )
+            lookup = {
+                k: np.array(list(v.values()))
+                for k, v in df.to_dict(orient="index").items()
+            }
 
             return lookup[self]
 
@@ -191,20 +192,16 @@ class UnexpectedEndOfStream(Exception):
 
 
 class StreamReader:
-
     @property
     def empty(self):
         return self._q.empty()
 
     def __init__(self, stream):
-        assert stream is not None, f'Stream is None'
+        assert stream is not None, f"Stream is None"
         self._s = stream
         self._q = Queue()
 
-        self._t = Thread(
-            target=self._populateQueue,
-            args=()
-        )
+        self._t = Thread(target=self._populateQueue, args=())
         self._t.daemon = True
         self._t.start()  # start collecting lines from the stream
 
@@ -262,14 +259,16 @@ def runProcess(
     if logPath is not None:
         logPath.parent.mkdir(parents=True, exist_ok=True)
 
-    openMode = 'a' if logAppend else 'w'
+    openMode = "a" if logAppend else "w"
     logFile = logPath.open(openMode) if logPath is not None else None
 
     # spinner = itertools.cycle('|/-\\')
     spinner = itertools.cycle("⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏")
 
     if not suppress:
-        progress = tqdm.tqdm(desc='Running :', leave=False, bar_format='{desc} {elapsed}')
+        progress = tqdm.tqdm(
+            desc="Running :", leave=False, bar_format="{desc} {elapsed}"
+        )
     else:
         progress = None
 
@@ -285,9 +284,9 @@ def runProcess(
 
     try:
         with subprocess.Popen(
-                args,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
+            args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
         ) as proc:
             while True:
                 line = proc.stdout.readline()
@@ -296,12 +295,12 @@ def runProcess(
                 # for line in iter(process.stdout.readline, b''):
 
                 if progress is not None:
-                    progress.set_description_str(f'Running {next(spinner)}')
+                    progress.set_description_str(f"Running {next(spinner)}")
 
                 if not line:
                     continue
 
-                text = str(line, encoding='utf-8')
+                text = str(line, encoding="utf-8")
 
                 if logFile is not None:
                     # if error_line is not None:
@@ -309,34 +308,40 @@ def runProcess(
                     logFile.write(text)
 
                 testText = text.lower()
-                if re.search(r'^\s*puts', testText) is None:
+                if re.search(r"^\s*puts", testText) is None:
                     if extendedErrorInfo or (
-                            text[0] != "#" and 'error' in text.lower() and '0 errors' not in text.lower()):
-                        if '\t' in text or extendedErrorInfo:
-                            errors[-1][-1] += f'\t\t{text}'
+                        text[0] != "#"
+                        and "error" in text.lower()
+                        and "0 errors" not in text.lower()
+                    ):
+                        if "\t" in text or extendedErrorInfo:
+                            errors[-1][-1] += f"\t\t{text}"
                         else:
                             try:
-                                code = re.search(r'\.\s+\(([\w\d\-]+)\)', text).group(1)
+                                code = re.search(r"\.\s+\(([\w\d\-]+)\)", text).group(1)
                             except:
                                 code = "n/a"
                             errors.append([code, text])
 
-                    if re.search(r'^\s*extended error info:', testText) is not None:
+                    if re.search(r"^\s*extended error info:", testText) is not None:
                         extendedErrorInfo = True
-                    elif re.search(r"^[\s\t]*-- end extended error info", testText) is not None:
+                    elif (
+                        re.search(r"^[\s\t]*-- end extended error info", testText)
+                        is not None
+                    ):
                         killProcess = True
-                    elif re.search('__OUTPUT_(\w+)__', text) is not None:
-                        outputKey = re.search('__OUTPUT_(\w+)__', text).group(1)
+                    elif re.search("__OUTPUT_(\w+)__", text) is not None:
+                        outputKey = re.search("__OUTPUT_(\w+)__", text).group(1)
                         outputs[outputKey] = ""
                     elif outputKey is not None:
                         outputs[outputKey] += text
-                    elif '__END_OUTPUT__' in text:
+                    elif "__END_OUTPUT__" in text:
                         outputKey = None
 
                 if printOutput:
-                    printer(text, end='')
+                    printer(text, end="")
                     if killProcess:
-                        printer(f' *** Killing Process *** ')
+                        printer(f" *** Killing Process *** ")
 
                 if killProcess:
                     proc.kill()
@@ -357,18 +362,20 @@ def tclParamSub(template: Union[Path, str], **params):
     # Read template
     _t = template.read_text() if isinstance(template, Path) else template
 
-    removedComments = re.sub(r'(?m)^ *#.*\n?', '', _t)
+    removedComments = re.sub(r"(?m)^ *#.*\n?", "", _t)
 
     # Check key matches
     foundKeys = {
-        m.group(1).strip('_'): m.group(2).strip('_') if m.group(2) is not None else None
-        for m in re.finditer('\s*[^#+]\s*__(\w+)(?:\|([\w\d\./]+))?__', removedComments)
+        m.group(1).strip("_"): m.group(2).strip("_") if m.group(2) is not None else None
+        for m in re.finditer("\s*[^#+]\s*__(\w+)(?:\|([\w\d\./]+))?__", removedComments)
     }
 
     settingKeys = set([k.upper() for k in params.keys()])
 
     # find keys that are not defined and do not have default values
-    diffKeys = [k for k in set(foundKeys).difference(settingKeys) if foundKeys[k] is None]
+    diffKeys = [
+        k for k in set(foundKeys).difference(settingKeys) if foundKeys[k] is None
+    ]
 
     if len(diffKeys) > 0:
         raise Exception(
@@ -376,29 +383,29 @@ def tclParamSub(template: Union[Path, str], **params):
         )
 
     # Validate Path values
-    params = {k: f'{v}' if isinstance(v, Path) else v for k, v in params.items()}
+    params = {k: f"{v}" if isinstance(v, Path) else v for k, v in params.items()}
 
     for k, v in params.items():
         try:
             hasDefault = foundKeys[k.upper()] is not None
         except:
             continue
-        repKey = f'__{k.upper()}__'
+        repKey = f"__{k.upper()}__"
         if v is not None:
             if isinstance(v, str):
                 value = f'"{v}"'
             elif isinstance(v, list):
-                value = '{ ' + " ".join([f'{i}' for i in v]) + ' }'
+                value = "{ " + " ".join([f"{i}" for i in v]) + " }"
             else:
-                value = f'{v}'
+                value = f"{v}"
         elif hasDefault:  # load found default value if none provided
-            value = f'{foundKeys[k.upper()]}'
+            value = f"{foundKeys[k.upper()]}"
             try:
                 _ = float(value)
-                repKey = f'__{k.upper()}\|{foundKeys[k.upper()]}__'.replace('.', '\.')
+                repKey = f"__{k.upper()}\|{foundKeys[k.upper()]}__".replace(".", "\.")
             except:
                 value = f'"{value}"'
-                repKey = f'__{k.upper()}\|{foundKeys[k.upper()]}__'
+                repKey = f"__{k.upper()}\|{foundKeys[k.upper()]}__"
         else:
             value = '""'
         _t = re.sub(repKey, value, _t)
@@ -408,7 +415,9 @@ def tclParamSub(template: Union[Path, str], **params):
 def nameGen(length):
     def _makeSeq():
         while True:
-            yield ''.join(random.choices(string.ascii_letters + string.digits + '_', k=length))
+            yield "".join(
+                random.choices(string.ascii_letters + string.digits + "_", k=length)
+            )
 
     return _makeSeq()
 
@@ -429,11 +438,7 @@ def runTclTemplateOnBench(
     **params,
 ):
     runTclTemplate(
-        template,
-        command,
-        logPath,
-        printOutput,
-        **benchmark.paramDict(**params)
+        template, command, logPath, printOutput, **benchmark.paramDict(**params)
     )
 
 
@@ -461,56 +466,69 @@ def runTclTemplate(
 
     if command is None:
         try:
-            command = re.search(r"\#\s*command:\s*(\w+)\s*", loadedTemplate).group(1).strip(' \n')
+            command = (
+                re.search(r"\#\s*command:\s*(\w+)\s*", loadedTemplate)
+                .group(1)
+                .strip(" \n")
+            )
         except:
             raise TCLTemplateException(
-                rc=1, errors=[],
-                msg=f'Command must be specified in template or in function call for template: {template}'
+                rc=1,
+                errors=[],
+                msg=f"Command must be specified in template or in function call for template: {template}",
             )
 
     helpersPath = template.helperPath
     if helpersPath.exists():
-        loadedTemplate = f'{helpersPath.read_text()}\n{loadedTemplate}'
+        loadedTemplate = f"{helpersPath.read_text()}\n{loadedTemplate}"
 
     procArgs = [command]
-    if command == 'tmax':
-        procArgs.append('-shell')
-    elif command == 'dc_shell':
-        procArgs.append('-f')
+    if command == "tmax":
+        procArgs.append("-shell")
+    elif command == "dc_shell":
+        procArgs.append("-f")
     else:
-        raise Exception(f'Unsupported command: {command}')
+        raise Exception(f"Unsupported command: {command}")
 
     namer = nameGen(10)
     name = next(namer)
-    tmpDir = Path('/tmp').resolve()
+    tmpDir = Path("/tmp").resolve()
     if not tmpDir.exists():
         tmpDir.mkdir(parents=True)
-    tclFile = tmpDir / f'tmp_{name}.tcl'
+    tclFile = tmpDir / f"tmp_{name}.tcl"
     while tclFile.exists():
         name = next(namer)
-        tclFile = tmpDir / f'tmp_{name}.tcl'
+        tclFile = tmpDir / f"tmp_{name}.tcl"
     tclFile.write_text(loadedTemplate)
 
     procArgs.append(tclFile.as_posix())
     printer = tqdm.tqdm.write
     outputs = None
     try:
-        printer('\n************************************************************************************************')
+        printer(
+            "\n************************************************************************************************"
+        )
         printer(f'{"Command":<27}: {command} {template}')
         printer(f'{"Params":<27}: {params}')
         printer(f'{"Log Path":<27}: {logPath}')
-        rc, errors, outputs = runProcess(procArgs, logPath=logPath, printOutput=printOutput)
+        rc, errors, outputs = runProcess(
+            procArgs, logPath=logPath, printOutput=printOutput
+        )
         tclFile.unlink()
         printer(f'{"Return Status":<27}: {"COMPLETED" if rc == 0 else "FAILED"}')
         if errors is not None and len(errors) > 0:
-            printer(f'{len(errors)} errors found')
-            printer('------------------------------------------------')
+            printer(f"{len(errors)} errors found")
+            printer("------------------------------------------------")
             printer(f'{"CODE":<12} ERROR')
             for code, err in errors:
-                printer(f'{code:<12} {err}', end='')
-        printer('************************************************************************************************\n')
+                printer(f"{code:<12} {err}", end="")
+        printer(
+            "************************************************************************************************\n"
+        )
         if rc != 0:
-            raise TCLTemplateException(rc=rc, errors=errors, msg='Template error killed process')
+            raise TCLTemplateException(
+                rc=rc, errors=errors, msg="Template error killed process"
+            )
     finally:
         if tclFile.exists():
             tclFile.unlink()
@@ -527,24 +545,24 @@ def getFilesWithFilter(
     version: str = None,
     modifier: str = None,
     fileExt: Union[str, List[str]] = None,
-    recursive=False
+    recursive=False,
 ) -> [Path]:
     globString = ""
 
     if design_name is not None:
-        globString += f'{design_name}'
+        globString += f"{design_name}"
     if lib_name is not None:
-        globString += f'_{lib_name}'
+        globString += f"_{lib_name}"
     if tech_node is not None:
-        globString += f'{tech_node}'
+        globString += f"{tech_node}"
     if lib_voltage is not None:
-        globString += f'_{lib_voltage}'
+        globString += f"_{lib_voltage}"
     if lib_version is not None:
-        globString += f'_{lib_version}'
+        globString += f"_{lib_version}"
     if version is not None:
-        globString += f'_{version}'
+        globString += f"_{version}"
     if modifier is not None:
-        globString += f'_{modifier}'
+        globString += f"_{modifier}"
 
     if recursive:
         globFunc = path.rglob
@@ -558,7 +576,7 @@ def getFilesWithFilter(
 
     files = []
     if exts is None:
-        assert len(globString) > 0, f'At least one filter parameter must be set'
+        assert len(globString) > 0, f"At least one filter parameter must be set"
         files = list(globFunc(f"*{globString}*"))
     else:
         for ext in exts:

@@ -27,6 +27,10 @@ NetID = str
 PortID = str
 
 
+class UndeclaredNetError(Exception):
+    pass
+
+
 class GraphDataFactory(Protocol):
     @staticmethod
     def fromData(data: Data):
@@ -528,9 +532,15 @@ class BaseGraphReader(Protocol):
                 nodeType = NodeType.fromString(net)
                 self.addBias(nodeType, nodeType.name)
             elif node.portIsInput(pin):
-                self.nets[net].goingTo.add(nodePort)
+                try:
+                    self.nets[net].goingTo.add(nodePort)
+                except KeyError:
+                    raise UndeclaredNetError(f"Trying to add undeclared net: {net}")
             elif node.portIsOutput(pin):
-                self.nets[net].leavingFrom.add(nodePort)
+                try:
+                    self.nets[net].leavingFrom.add(nodePort)
+                except KeyError:
+                    raise UndeclaredNetError(f"Trying to add undeclared net: {net}")
                 if len(self.nets[net].leavingFrom) > 1:
                     raise Exception(f"Defining more than 1 output for net {net}")
             else:
